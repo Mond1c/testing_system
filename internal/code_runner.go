@@ -3,7 +3,6 @@ package internal
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -62,7 +61,6 @@ func (ctx *CodeRunnerContext) runTest(test *Test) (TestResult, error) {
 	if err != nil {
 		return RE, err
 	}
-	defer input.Close()
 
 	go func() {
 		defer input.Close()
@@ -71,7 +69,7 @@ func (ctx *CodeRunnerContext) runTest(test *Test) (TestResult, error) {
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatal(err)
+		return RE, err
 	}
 	return compareOutput(test.output, string(output)), nil
 }
