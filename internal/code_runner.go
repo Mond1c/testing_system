@@ -19,7 +19,7 @@ type CodeRunnerContext struct {
 	threads        int
 }
 
-func NewCodeRunnerContext(filePath, executablePath string) *CodeRunnerContext {
+func NewCodeRunnerContext(filePath, executablePath, language string) *CodeRunnerContext {
 	threads := 4
 	results := make([]chan TestingResult, threads)
 	for i := 0; i < threads; i++ {
@@ -27,7 +27,7 @@ func NewCodeRunnerContext(filePath, executablePath string) *CodeRunnerContext {
 	}
 	return &CodeRunnerContext{
 		filePath:       filePath,
-		language:       "c++",
+		language:       language,
 		executablePath: executablePath,
 		results:        results,
 		threads:        threads,

@@ -70,7 +70,6 @@ func test(w http.ResponseWriter, r *http.Request) {
 }
 
 func InitApi() {
-	http.HandleFunc("/", hello)
 	http.HandleFunc("/test", test)
-	http.HandleFunc("/upload", uploadHandler)
+	http.HandleFunc("/", uploadHandler)
 }

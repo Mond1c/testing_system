@@ -19,12 +19,13 @@ func generateTests() []*Test {
 	return tests
 }
 
-func getExecutableName(fileName string) string {
+func getExecutableNameAndLanguage(fileName string) (string, string) {
 	arr := strings.Split(fileName, ".")
-	if len(arr) < 2 {
+	if len(arr) != 2 {
 		log.Fatal("file name is invalid")
+		return "", ""
 	}
-	return fmt.Sprintf("%s.%s", arr[0], ".out")
+	return fmt.Sprintf("%s.%s", arr[0], "out"), arr[1]
 }
 
 func NewTestSystem(fileName string) *TestSystem {
@@ -35,6 +36,7 @@ func NewTestSystem(fileName string) *TestSystem {
 }
 
 func (ts *TestSystem) Run() (TestingResult, error) {
-	ctx := NewCodeRunnerContext(ts.fileName, getExecutableName(ts.fileName))
+	executableName, executableLang := getExecutableNameAndLanguage(ts.fileName)
+	ctx := NewCodeRunnerContext(ts.fileName, executableName, executableLang)
 	return ctx.Test(ts.tests)
 }
