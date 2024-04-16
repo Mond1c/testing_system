@@ -35,13 +35,13 @@ func NewCodeRunnerContext(filePath, executablePath, language string) *CodeRunner
 }
 
 type TestingResult struct {
-	number int
-	result TestResult
+	Number int        `json:"number"`
+	Result TestResult `json:"result"`
 	Err    error
 }
 
 func (t *TestingResult) GetString() string {
-	return fmt.Sprintf("Test with number %d: %s", t.number, t.result.GetString())
+	return fmt.Sprintf("Test with number %d: %s", t.Number, t.Result.GetString())
 }
 
 // compileProgram compiles source code to executable file using giving CodeRunnerContext.
@@ -109,11 +109,11 @@ func (ctx *CodeRunnerContext) runPartTests(tests []*Test, start, end, number int
 	for i := start; i < end; i++ {
 		testResult, err := ctx.runTest(tests[i])
 		if err != nil || testResult != OK {
-			ctx.results[number] <- TestingResult{number: i, result: testResult, Err: err}
+			ctx.results[number] <- TestingResult{Number: i, Result: testResult, Err: err}
 			return
 		}
 	}
-	ctx.results[number] <- TestingResult{number: -1, result: OK, Err: nil}
+	ctx.results[number] <- TestingResult{Number: -1, Result: OK, Err: nil}
 }
 
 // Test tests program on given tests and returns result of testing
@@ -122,7 +122,7 @@ func (ctx *CodeRunnerContext) Test(tests []*Test) (TestingResult, error) {
 	err := ctx.compileProgram()
 	defer ctx.removeExecutable()
 	if err != nil {
-		return TestingResult{number: -1, result: CE}, err
+		return TestingResult{Number: -1, Result: CE}, err
 	}
 	step := len(tests) / ctx.threads // maybe make constant
 	var wg sync.WaitGroup
@@ -136,10 +136,10 @@ func (ctx *CodeRunnerContext) Test(tests []*Test) (TestingResult, error) {
 	wg.Wait()
 	for i := 0; i < ctx.threads; i++ {
 		result := <-ctx.results[i]
-		if result.result != OK || result.Err != nil {
+		if result.Result != OK || result.Err != nil {
 			return result, result.Err
 		}
 	}
 	log.Printf("Time elapsed: %v", time.Since(start))
-	return TestingResult{number: -1, result: OK}, nil
+	return TestingResult{Number: -1, Result: OK}, nil
 }

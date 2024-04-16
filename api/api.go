@@ -8,28 +8,6 @@ import (
 	"test_system/internal"
 )
 
-//func uploadHandler(c *fiber.Ctx) error {
-//	_, err := c.WriteString(`<html>
-//<head>
-//  <title>GoLang HTTP Fileserver</title>
-//</head>
-//
-//<body>
-//
-//<h2>Upload a file</h2>
-//
-//<form action="/api/test" method="post" enctype="multipart/form-data">
-//  <label for="file">Filename:</label>
-//  <input type="file" name="file" id="file">
-//  <br>
-//  <input type="submit" name="submit" value="Submit">
-//</form>
-//
-//</body>
-//</html>`)
-//	return err
-//}
-
 func test(c *fiber.Ctx) error {
 	header, err := c.FormFile("file")
 	if err != nil {
@@ -69,7 +47,7 @@ func test(c *fiber.Ctx) error {
 		log.Fatal(err)
 		return err
 	}
-	_, err = c.WriteString(result.GetString())
+	err = c.JSON(result)
 	if err != nil {
 		log.Fatal(err)
 		return err
