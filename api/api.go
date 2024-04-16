@@ -9,11 +9,6 @@ import (
 	"test_system/internal"
 )
 
-// TODO: Delete Me
-func hello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello\n")
-}
-
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		fmt.Fprintf(w, `<html>
@@ -66,7 +61,10 @@ func test(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 		return
 	}
-	io.WriteString(w, result.GetString())
+	_, err = io.WriteString(w, result.GetString())
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func InitApi() {

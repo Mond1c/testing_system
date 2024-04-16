@@ -76,8 +76,16 @@ func (ctx *CodeRunnerContext) runTest(test *Test) (TestResult, error) {
 	}
 
 	go func() {
-		defer input.Close()
-		io.WriteString(input, test.input)
+		defer func(input io.WriteCloser) {
+			err := input.Close()
+			if err != nil {
+				log.Fatal(err)
+			}
+		}(input)
+		_, err := io.WriteString(input, test.input)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}()
 
 	output, err := cmd.CombinedOutput()
