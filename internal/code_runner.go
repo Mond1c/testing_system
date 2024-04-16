@@ -7,25 +7,37 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
+	"time"
 )
 
 type CodeRunnerContext struct {
 	filePath       string
 	language       string
 	executablePath string
+	results        []chan TestingResult
+	threads        int
 }
 
 func NewCodeRunnerContext(filePath, executablePath string) *CodeRunnerContext {
+	threads := 4
+	results := make([]chan TestingResult, threads)
+	for i := 0; i < threads; i++ {
+		results[i] = make(chan TestingResult, 1)
+	}
 	return &CodeRunnerContext{
 		filePath:       filePath,
 		language:       "c++",
 		executablePath: executablePath,
+		results:        results,
+		threads:        threads,
 	}
 }
 
 type TestingResult struct {
 	number int
 	result TestResult
+	Err    error
 }
 
 func (t *TestingResult) GetString() string {
@@ -84,21 +96,41 @@ func (ctx *CodeRunnerContext) removeExecutable() {
 
 // TODO: rewrite to gorutines
 
+func (ctx *CodeRunnerContext) runPartTests(tests []*Test, start, end, number int) {
+	for i := start; i < end; i++ {
+		testResult, err := ctx.runTest(tests[i])
+		if err != nil || testResult != OK {
+			ctx.results[number] <- TestingResult{number: i, result: testResult, Err: err}
+			return
+		}
+	}
+	ctx.results[number] <- TestingResult{number: -1, result: OK, Err: nil}
+}
+
 // Test tests program on given tests and returns result of testing
 func (ctx *CodeRunnerContext) Test(tests []*Test) (TestingResult, error) {
+	start := time.Now()
 	err := ctx.compileProgram()
 	defer ctx.removeExecutable()
 	if err != nil {
 		return TestingResult{number: -1, result: CE}, err
 	}
-	for i := 0; i < len(tests); i++ {
-		testResult, err := ctx.runTest(tests[i])
-		if err != nil {
-			return TestingResult{number: i, result: testResult}, err
-		}
-		if testResult != OK {
-			return TestingResult{number: i, result: testResult}, err
+	step := len(tests) / ctx.threads // maybe make constant
+	var wg sync.WaitGroup
+	for i := 0; i < len(tests); i += step {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ctx.runPartTests(tests, i, i+step, i/step)
+		}()
+	}
+	wg.Wait()
+	for i := 0; i < ctx.threads; i++ {
+		result := <-ctx.results[i]
+		if result.result != OK || result.Err != nil {
+			return result, result.Err
 		}
 	}
+	log.Printf("Time elapsed: %v", time.Since(start))
 	return TestingResult{number: -1, result: OK}, nil
 }
