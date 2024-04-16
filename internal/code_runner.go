@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -14,11 +15,11 @@ type CodeRunnerContext struct {
 	executablePath string
 }
 
-func NewCodeRunnerContext(filePath string) *CodeRunnerContext {
+func NewCodeRunnerContext(filePath, executablePath string) *CodeRunnerContext {
 	return &CodeRunnerContext{
 		filePath:       filePath,
 		language:       "c++",
-		executablePath: "test.out",
+		executablePath: executablePath,
 	}
 }
 
@@ -74,11 +75,19 @@ func (ctx *CodeRunnerContext) runTest(test *Test) (TestResult, error) {
 	return compareOutput(test.output, string(output)), nil
 }
 
+func (ctx *CodeRunnerContext) removeExecutable() {
+	err := os.Remove(ctx.executablePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 // TODO: rewrite to gorutines
 
 // Test tests program on given tests and returns result of testing
 func (ctx *CodeRunnerContext) Test(tests []*Test) (TestingResult, error) {
 	err := ctx.compileProgram()
+	defer ctx.removeExecutable()
 	if err != nil {
 		return TestingResult{number: -1, result: CE}, err
 	}
