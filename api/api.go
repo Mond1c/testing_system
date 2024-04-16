@@ -1,57 +1,60 @@
 package api
 
 import (
-	"fmt"
+	"github.com/gofiber/fiber/v2"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"test_system/internal"
 )
 
-func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		fmt.Fprintf(w, `<html>
-<head>
-  <title>GoLang HTTP Fileserver</title>
-</head>
+//func uploadHandler(c *fiber.Ctx) error {
+//	_, err := c.WriteString(`<html>
+//<head>
+//  <title>GoLang HTTP Fileserver</title>
+//</head>
+//
+//<body>
+//
+//<h2>Upload a file</h2>
+//
+//<form action="/api/test" method="post" enctype="multipart/form-data">
+//  <label for="file">Filename:</label>
+//  <input type="file" name="file" id="file">
+//  <br>
+//  <input type="submit" name="submit" value="Submit">
+//</form>
+//
+//</body>
+//</html>`)
+//	return err
+//}
 
-<body>
-
-<h2>Upload a file</h2>
-
-<form action="/test" method="post" enctype="multipart/form-data">
-  <label for="file">Filename:</label>
-  <input type="file" name="file" id="file">
-  <br>
-  <input type="submit" name="submit" value="Submit">
-</form>
-
-</body>
-</html>`)
-	}
-}
-
-func test(w http.ResponseWriter, r *http.Request) {
-	file, header, err := r.FormFile("file")
+func test(c *fiber.Ctx) error {
+	header, err := c.FormFile("file")
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		c.SendStatus(fiber.StatusBadRequest)
 		log.Fatal(err)
-		return
+		return err
+	}
+	file, err := header.Open()
+	if err != nil {
+		log.Fatal(err)
+		return err
 	}
 	defer file.Close()
 	out, err := os.Create(header.Filename)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		c.SendStatus(fiber.StatusInternalServerError)
 		log.Fatal(err)
-		return
+		return err
 	}
 	defer out.Close()
 	_, err = io.Copy(out, file)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		c.SendStatus(fiber.StatusInternalServerError)
 		log.Fatal(err)
-		return
+		return err
 	}
 	log.Print("File upload successful")
 	defer func(name string) {
@@ -64,15 +67,31 @@ func test(w http.ResponseWriter, r *http.Request) {
 	result, err := ts.RunTests()
 	if err != nil {
 		log.Fatal(err)
-		return
+		return err
 	}
-	_, err = io.WriteString(w, result.GetString())
+	_, err = c.WriteString(result.GetString())
 	if err != nil {
 		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
-func InitApi() {
-	http.HandleFunc("/test", test)
-	http.HandleFunc("/", uploadHandler)
+type SimpleResponse struct {
+	Message string `json:"message"`
+}
+
+func simple(c *fiber.Ctx) error {
+	log.Println(123)
+	err := c.JSON(&SimpleResponse{Message: "ok"})
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
+func InitApi(app *fiber.App) {
+	app.Post("/api/test", test)
+	app.Get("/api/simple", simple)
 }
