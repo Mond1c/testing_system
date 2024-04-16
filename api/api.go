@@ -8,6 +8,7 @@ import (
 	"test_system/internal"
 )
 
+// TODO: rewrite
 func test(c *fiber.Ctx) error {
 	header, err := c.FormFile("file")
 	if err != nil {
@@ -15,6 +16,7 @@ func test(c *fiber.Ctx) error {
 		log.Fatal(err)
 		return err
 	}
+	language := c.FormValue("language")
 	file, err := header.Open()
 	if err != nil {
 		log.Fatal(err)
@@ -41,7 +43,7 @@ func test(c *fiber.Ctx) error {
 			log.Fatal(err)
 		}
 	}(header.Filename)
-	ts := internal.NewRun(header.Filename)
+	ts := internal.NewRun(header.Filename, language)
 	result, err := ts.RunTests()
 	if err != nil {
 		log.Fatal(err)

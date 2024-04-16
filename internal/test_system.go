@@ -10,6 +10,7 @@ import (
 type Run struct {
 	tests    []*Test
 	fileName string
+	language string
 }
 
 // generateTests test function
@@ -22,27 +23,28 @@ func generateTests() []*Test {
 	return tests
 }
 
-// getExecutableNameAndLanguage returns name for the executable file and the programming language that was used in the file
-func getExecutableNameAndLanguage(fileName string) (string, string) {
+// getExecutableName returns name for the executable file and the programming language that was used in the file
+func getExecutableName(fileName string) string {
 	arr := strings.Split(fileName, ".")
 	if len(arr) != 2 {
 		log.Fatal("file name is invalid")
-		return "", ""
+		return ""
 	}
-	return fmt.Sprintf("%s.%s", arr[0], "out"), arr[1]
+	return fmt.Sprintf("%s.%s", arr[0], "out")
 }
 
 // NewRun creates Run
-func NewRun(fileName string) *Run {
+func NewRun(fileName, language string) *Run {
 	return &Run{
 		fileName: fileName,
 		tests:    generateTests(),
+		language: language,
 	}
 }
 
 // RunTests runs tests and return the result of testing
 func (ts *Run) RunTests() (TestingResult, error) {
-	executableName, executableLang := getExecutableNameAndLanguage(ts.fileName)
-	ctx := NewCodeRunnerContext(ts.fileName, executableName, executableLang)
+	executableName := getExecutableName(ts.fileName)
+	ctx := NewCodeRunnerContext(ts.fileName, executableName, ts.language)
 	return ctx.Test(ts.tests)
 }

@@ -17,6 +17,7 @@ type CodeRunnerContext struct {
 	executablePath string
 	results        []chan TestingResult
 	threads        int
+	failed         bool
 }
 
 func NewCodeRunnerContext(filePath, executablePath, language string) *CodeRunnerContext {
@@ -44,23 +45,51 @@ func (t *TestingResult) GetString() string {
 	return fmt.Sprintf("Test with number %d: %s", t.Number, t.Result.GetString())
 }
 
+func (ctx *CodeRunnerContext) makeExecutable() error {
+	_, err := exec.Command("chmod", "+x", ctx.executablePath).Output()
+	return err
+}
+
+func (ctx *CodeRunnerContext) compileCpp() error {
+	_, err := exec.Command("g++", "-std=c++20", "-o", ctx.executablePath, ctx.filePath).Output()
+	if err != nil {
+		return err
+	}
+	return ctx.makeExecutable()
+}
+
+func (ctx *CodeRunnerContext) compileJava() error {
+	panic("implement me")
+}
+
+func (ctx *CodeRunnerContext) compileGo() error {
+	_, err := exec.Command("go", "build", "-o", ctx.executablePath, ctx.filePath).Output()
+	if err != nil {
+		return err
+	}
+	return ctx.makeExecutable()
+}
+
 // compileProgram compiles source code to executable file using giving CodeRunnerContext.
 // Using specific compiler based on given language.
 func (ctx *CodeRunnerContext) compileProgram() error {
 	if _, err := os.Stat(ctx.filePath); os.IsNotExist(err) {
 		return err
 	}
-	_, err := exec.Command("g++", "-std=c++20", "-o", ctx.executablePath, ctx.filePath).Output()
-	if err != nil {
-		return err
+	switch ctx.language {
+	case "cpp":
+		return ctx.compileCpp()
+	case "go":
+		return ctx.compileGo()
+	default:
+		return fmt.Errorf("unsupported language: %s", ctx.language)
 	}
-	_, err = exec.Command("chmod", "+x", ctx.executablePath).Output()
-	return err
 }
 
 // compareOutput compares output with test case output.
 func compareOutput(original, output string) TestResult {
 	output = strings.Trim(output, "\n")
+	log.Println(original, output)
 	if original == output {
 		return OK
 	}
@@ -107,8 +136,12 @@ func (ctx *CodeRunnerContext) removeExecutable() {
 // runPartTests runs part of the tests with the specified start and end indexes.
 func (ctx *CodeRunnerContext) runPartTests(tests []*Test, start, end, number int) {
 	for i := start; i < end; i++ {
+		if ctx.failed {
+			break
+		}
 		testResult, err := ctx.runTest(tests[i])
 		if err != nil || testResult != OK {
+			ctx.failed = true
 			ctx.results[number] <- TestingResult{Number: i, Result: testResult, Err: err}
 			return
 		}
