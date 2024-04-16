@@ -5,14 +5,14 @@ import "time"
 type ProblemInfo = string
 
 type RunInfo struct {
-	result TestingResult
-	time   time.Duration
+	Result TestingResult `json:"result"`
+	Time   time.Duration `json:"time"`
 }
 
 func NewRunInfo(result TestingResult, t time.Duration) *RunInfo {
 	return &RunInfo{
-		result: result,
-		time:   t,
+		Result: result,
+		Time:   t,
 	}
 }
 
