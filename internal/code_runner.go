@@ -58,6 +58,7 @@ func (ctx *CodeRunnerContext) compileProgram() error {
 	return err
 }
 
+// compareOutput compares output with test case output.
 func compareOutput(original, output string) TestResult {
 	output = strings.Trim(output, "\n")
 	if original == output {
@@ -95,6 +96,7 @@ func (ctx *CodeRunnerContext) runTest(test *Test) (TestResult, error) {
 	return compareOutput(test.output, string(output)), nil
 }
 
+// removeExecutable removes file that creates after compilation
 func (ctx *CodeRunnerContext) removeExecutable() {
 	err := os.Remove(ctx.executablePath)
 	if err != nil {
@@ -102,8 +104,7 @@ func (ctx *CodeRunnerContext) removeExecutable() {
 	}
 }
 
-// TODO: rewrite to gorutines
-
+// runPartTests runs part of the tests with the specified start and end indexes.
 func (ctx *CodeRunnerContext) runPartTests(tests []*Test, start, end, number int) {
 	for i := start; i < end; i++ {
 		testResult, err := ctx.runTest(tests[i])

@@ -5,10 +5,12 @@ type Test struct {
 	output string
 }
 
+// NewTest creates new test case that can be used in CodeRunnerContext.Test
 func NewTest(input, output string) *Test {
 	return &Test{input: input, output: output}
 }
 
+// TestResult type of the enum
 type TestResult int
 
 const (
@@ -20,8 +22,6 @@ const (
 	UB
 	WA
 )
-
-// TODO: Maybe return error
 
 // GetString returns string representation of the test result
 func (t *TestResult) GetString() string {
@@ -38,6 +38,7 @@ func (t *TestResult) GetString() string {
 		return "Memory limit"
 	case UB:
 		return "Something went wrong"
+	default:
+		return "Unexpected result"
 	}
-	return "Unexpected result"
 }

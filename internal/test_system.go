@@ -6,11 +6,14 @@ import (
 	"strings"
 )
 
-type TestSystem struct {
+// Run represents information that need to execute program on the specified tests
+type Run struct {
 	tests    []*Test
 	fileName string
 }
 
+// generateTests test function
+// TODO: need to delete in the future
 func generateTests() []*Test {
 	tests := make([]*Test, 1000)
 	for i := 0; i < 1000; i++ {
@@ -19,6 +22,7 @@ func generateTests() []*Test {
 	return tests
 }
 
+// getExecutableNameAndLanguage returns name for the executable file and the programming language that was used in the file
 func getExecutableNameAndLanguage(fileName string) (string, string) {
 	arr := strings.Split(fileName, ".")
 	if len(arr) != 2 {
@@ -28,14 +32,16 @@ func getExecutableNameAndLanguage(fileName string) (string, string) {
 	return fmt.Sprintf("%s.%s", arr[0], "out"), arr[1]
 }
 
-func NewTestSystem(fileName string) *TestSystem {
-	return &TestSystem{
+// NewRun creates Run
+func NewRun(fileName string) *Run {
+	return &Run{
 		fileName: fileName,
 		tests:    generateTests(),
 	}
 }
 
-func (ts *TestSystem) Run() (TestingResult, error) {
+// RunTests runs tests and return the result of testing
+func (ts *Run) RunTests() (TestingResult, error) {
 	executableName, executableLang := getExecutableNameAndLanguage(ts.fileName)
 	ctx := NewCodeRunnerContext(ts.fileName, executableName, executableLang)
 	return ctx.Test(ts.tests)

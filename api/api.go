@@ -54,9 +54,14 @@ func test(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Print("File upload successful")
-	defer os.Remove(header.Filename)
-	ts := internal.NewTestSystem(header.Filename)
-	result, err := ts.Run()
+	defer func(name string) {
+		err := os.Remove(name)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(header.Filename)
+	ts := internal.NewRun(header.Filename)
+	result, err := ts.RunTests()
 	if err != nil {
 		log.Fatal(err)
 		return
