@@ -21,7 +21,7 @@ func getExecutableName(fileName, language string) string {
 		return ""
 	}
 	if language == "java" {
-		return fmt.Sprintf("%s", arr[0])
+		return arr[0]
 	}
 	return fmt.Sprintf("%s.%s", arr[0], "out")
 }

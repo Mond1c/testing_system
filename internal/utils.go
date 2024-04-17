@@ -17,7 +17,7 @@ func RemoveFile(path string) {
 // CheckForErrorAndSendStatusWithLog if an error exists sends the specified status and logs the error
 func CheckForErrorAndSendStatusWithLog(c *fiber.Ctx, err error, status int) {
 	if err != nil {
-		c.SendStatus(status)
+		_ = c.SendStatus(status)
 		log.Fatal(err)
 	}
 }
