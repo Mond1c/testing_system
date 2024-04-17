@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"io"
 	"log"
 	"os"
@@ -76,8 +77,26 @@ func getMe(c *fiber.Ctx) error {
 	return nil
 }
 
+// TODO: what do if file now replacing
+func getResults(c *fiber.Ctx) error {
+	data, err := os.ReadFile(config.TestConfig.OutputPath)
+	if err != nil {
+		log.Fatalf("Can't read file: %v", err)
+		return err
+	}
+	var contest internal.ContestInfo
+	err = json.Unmarshal(data, &contest)
+	if err != nil {
+		log.Fatalf("Can't parse output contest info: %v", err)
+		return err
+	}
+	c.JSON(contest)
+	return nil
+}
+
 func InitApi(app *fiber.App) {
 	app.Post("/api/test", test)
 	app.Get("/api/problems", getProblems)
 	app.Get("/api/me", getMe)
+	app.Get("/api/results", getResults)
 }

@@ -47,6 +47,7 @@ func main() {
 	frontendRoutes := []string{
 		"/",
 		"/upload",
+		"/results",
 	}
 
 	for _, route := range frontendRoutes {
