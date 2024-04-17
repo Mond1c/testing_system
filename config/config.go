@@ -11,7 +11,13 @@ type Config struct {
 		Path       string `json:"path"`
 		TestsCount int    `json:"count"`
 	} `json:"tests"`
-	OutputPath string
+	OutputPath string `json:"outputPath"`
+	StartTime  string `json:"startTime"`
+	Contestans []struct {
+		Id   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"contestants"`
+	Problems []string `json:"problems"`
 }
 
 func newConfig() *Config {

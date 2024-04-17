@@ -69,10 +69,16 @@ const timeStepForContestUpdateMs = 10000
 
 var runs []*RunInfo
 
+// AddRun adds new run for the current contest
 func AddRun(run *RunInfo) {
 	runs = append(runs, run)
 }
 
+func GenerateContestInfo() {
+
+}
+
+// UpdateContestInfo upates info about the current contest and writes it to the specified json file
 func UpdateContestInfo() {
 	for {
 		data, err := os.ReadFile(config.TestConfig.OutputPath)

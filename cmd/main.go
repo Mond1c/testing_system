@@ -5,6 +5,7 @@ import (
 	"os"
 	"test_system/api"
 	"test_system/config"
+	"test_system/internal"
 
 	"flag"
 
@@ -48,6 +49,8 @@ func main() {
 	for _, route := range frontendRoutes {
 		app.Get(route, Render)
 	}
+
+	go internal.UpdateContestInfo()
 
 	err = app.Listen(":" + *port)
 	if err != nil {
