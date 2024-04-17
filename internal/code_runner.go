@@ -50,6 +50,7 @@ func (ctx *CodeRunnerContext) makeExecutable() error {
 	return err
 }
 
+// compileCpp compiles source code written on C++ to executable file
 func (ctx *CodeRunnerContext) compileCpp() error {
 	_, err := exec.Command("g++", "-std=c++20", "-o", ctx.executablePath, ctx.filePath).Output()
 	if err != nil {
@@ -58,10 +59,14 @@ func (ctx *CodeRunnerContext) compileCpp() error {
 	return ctx.makeExecutable()
 }
 
+// TODO: java runs very slow, need to fix
+// compilesJava compiles source code written on Java to executable file
 func (ctx *CodeRunnerContext) compileJava() error {
-	panic("implement me")
+	_, err := exec.Command("javac", ctx.filePath).Output()
+	return err
 }
 
+// compileGo compiles source code written on Go to executable file
 func (ctx *CodeRunnerContext) compileGo() error {
 	_, err := exec.Command("go", "build", "-o", ctx.executablePath, ctx.filePath).Output()
 	if err != nil {
@@ -81,6 +86,8 @@ func (ctx *CodeRunnerContext) compileProgram() error {
 		return ctx.compileCpp()
 	case "go":
 		return ctx.compileGo()
+	case "java":
+		return ctx.compileJava()
 	default:
 		return fmt.Errorf("unsupported language: %s", ctx.language)
 	}
@@ -114,7 +121,12 @@ func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (Te
 		return RE, err
 	}
 	defer inputFile.Close()
-	cmd := exec.Command("./" + ctx.executablePath)
+	var cmd *exec.Cmd
+	if ctx.language == "java" {
+		cmd = exec.Command("java", ctx.executablePath)
+	} else {
+		cmd = exec.Command("./" + ctx.executablePath)
+	}
 	cmd.Stdin = inputFile
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -127,7 +139,12 @@ func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (Te
 
 // removeExecutable removes file that creates after compilation
 func (ctx *CodeRunnerContext) removeExecutable() {
-	err := os.Remove(ctx.executablePath)
+	var err error
+	if ctx.language == "java" {
+		err = os.Remove(ctx.executablePath + ".class")
+	} else {
+		err = os.Remove(ctx.executablePath)
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
