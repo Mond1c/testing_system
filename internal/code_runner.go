@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -101,21 +100,32 @@ func compareOutput(original, output string) TestResult {
 	return WA
 }
 
+// getExpectedOutput gets expected output from the file with the specified path
+func (ctx *CodeRunnerContext) getExpectedOutput(path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	original := ""
+	for scanner.Scan() {
+		original += scanner.Text() + "\n"
+	}
+	return original, nil
+}
+
 // runTest runs test and return test result with giving CodeRunnerContext.
 // test runs using executable with executablePath file.
 func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (TestResult, error) {
-	file, err := os.Open(directoryWithTests + "/" + strconv.FormatInt(int64(number), 10) + ".out")
+	path := fmt.Sprintf("%s/%d", directoryWithTests, number)
+	original, err := ctx.getExpectedOutput(path + ".out")
 	if err != nil {
 		log.Fatal(err)
 		return RE, err
 	}
-	defer file.Close()
-	original := ""
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		original += scanner.Text() + "\n"
-	}
-	inputFile, err := os.Open(directoryWithTests + "/" + strconv.FormatInt(int64(number), 10) + ".in")
+	inputFile, err := os.Open(path + ".in")
 	if err != nil {
 		log.Fatal(err)
 		return RE, err
@@ -139,15 +149,11 @@ func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (Te
 
 // removeExecutable removes file that creates after compilation
 func (ctx *CodeRunnerContext) removeExecutable() {
-	var err error
+	path := ctx.executablePath
 	if ctx.language == "java" {
-		err = os.Remove(ctx.executablePath + ".class")
-	} else {
-		err = os.Remove(ctx.executablePath)
+		path += ".class"
 	}
-	if err != nil {
-		log.Fatal(err)
-	}
+	RemoveFile(path)
 }
 
 // runPartTests runs part of the tests with the specified start and end indexes.

@@ -13,16 +13,6 @@ type Run struct {
 	language           string
 }
 
-// generateTests test function
-// TODO: need to delete in the future
-func generateTests() []*Test {
-	tests := make([]*Test, 1000)
-	for i := 0; i < 1000; i++ {
-		tests[i] = NewTest(fmt.Sprintf("%d %d", i, i+1), fmt.Sprintf("%d", i+i+1))
-	}
-	return tests
-}
-
 // getExecutableName returns name for the executable file and the programming language that was used in the file
 func getExecutableName(fileName, language string) string {
 	arr := strings.Split(fileName, ".")

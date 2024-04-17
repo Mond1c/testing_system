@@ -1,15 +1,5 @@
 package internal
 
-type Test struct {
-	input  string
-	output string
-}
-
-// NewTest creates new test case that can be used in CodeRunnerContext.Test
-func NewTest(input, output string) *Test {
-	return &Test{input: input, output: output}
-}
-
 // TestResult type of the enum
 type TestResult int
 
