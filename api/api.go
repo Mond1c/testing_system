@@ -1,11 +1,12 @@
 package api
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"io"
 	"log"
 	"os"
 	"test_system/internal"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 // test tests uploading file with source code for correct working
@@ -14,6 +15,7 @@ func test(c *fiber.Ctx) error {
 	internal.CheckForErrorAndSendStatusWithLog(c, err, fiber.StatusBadRequest)
 
 	language := c.FormValue("language")
+	problem := c.FormValue("problem")
 
 	file, err := header.Open()
 	if err != nil {
@@ -30,7 +32,7 @@ func test(c *fiber.Ctx) error {
 	internal.CheckForErrorAndSendStatusWithLog(c, err, fiber.StatusInternalServerError)
 	defer internal.RemoveFile(header.Filename)
 
-	ts := internal.NewRun(header.Filename, language)
+	ts := internal.NewRun(header.Filename, language, problem)
 	result, err := ts.RunTests()
 	internal.CheckForErrorAndSendStatusWithLog(c, err, fiber.StatusInternalServerError)
 

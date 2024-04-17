@@ -1,3 +1,4 @@
 .idea
 test.out
 cmd/tests
+test.json

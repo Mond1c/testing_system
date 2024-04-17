@@ -1,17 +1,37 @@
 package main
 
 import (
+	"errors"
+	"os"
+	"test_system/api"
+	"test_system/config"
+
+	"flag"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/template/html/v2"
-	"test_system/api"
 )
 
-func Home(c *fiber.Ctx) error {
+func Render(c *fiber.Ctx) error {
 	return c.Render("index", fiber.Map{})
 }
 
 func main() {
+	port := flag.String("flag", "8080", "port for the server")
+	configPath := flag.String("config", "", "path to the config file")
+	flag.Parse()
+
+	if _, err := os.Stat(*configPath); errors.Is(err, os.ErrNotExist) {
+		log.Fatal(err)
+		return
+	}
+	var err error
+	config.TestConfig, err = config.ParseConfig(*configPath)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
 	engine := html.New("./frontend/build", ".html")
 	app := fiber.New(fiber.Config{
 		Views: engine,
@@ -26,10 +46,10 @@ func main() {
 	}
 
 	for _, route := range frontendRoutes {
-		app.Get(route, Home)
+		app.Get(route, Render)
 	}
 
-	err := app.Listen(":8080")
+	err = app.Listen(":" + *port)
 	if err != nil {
 		log.Fatal(err)
 	}
