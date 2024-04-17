@@ -22,6 +22,7 @@ func Render(c *fiber.Ctx) error {
 func main() {
 	port := flag.String("flag", "8080", "port for the server")
 	configPath := flag.String("config", "", "path to the config file")
+	generateOutput := flag.Bool("generate", false, "set it if you want generate output json file (turn on on first run)")
 	flag.Parse()
 
 	if _, err := os.Stat(*configPath); errors.Is(err, os.ErrNotExist) {
@@ -53,9 +54,11 @@ func main() {
 	for _, route := range frontendRoutes {
 		app.Get(route, Render)
 	}
-	err = internal.GenerateContestInfo()
-	if err != nil {
-		return
+	if *generateOutput {
+		err = internal.GenerateContestInfo()
+		if err != nil {
+			return
+		}
 	}
 	go internal.UpdateContestInfo()
 
