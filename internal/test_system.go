@@ -8,9 +8,9 @@ import (
 
 // Run represents information that need to execute program on the specified tests
 type Run struct {
-	tests    []*Test
-	fileName string
-	language string
+	directoryWithTests string
+	fileName           string
+	language           string
 }
 
 // generateTests test function
@@ -36,9 +36,9 @@ func getExecutableName(fileName string) string {
 // NewRun creates Run
 func NewRun(fileName, language string) *Run {
 	return &Run{
-		fileName: fileName,
-		tests:    generateTests(),
-		language: language,
+		fileName:           fileName,
+		directoryWithTests: "cmd/tests/",
+		language:           language,
 	}
 }
 
@@ -46,5 +46,5 @@ func NewRun(fileName, language string) *Run {
 func (ts *Run) RunTests() (TestingResult, error) {
 	executableName := getExecutableName(ts.fileName)
 	ctx := NewCodeRunnerContext(ts.fileName, executableName, ts.language)
-	return ctx.Test(ts.tests)
+	return ctx.Test(ts.directoryWithTests, 1000)
 }

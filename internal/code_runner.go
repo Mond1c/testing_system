@@ -1,12 +1,12 @@
 package internal
 
 import (
+	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"os/exec"
-	"strings"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -88,8 +88,6 @@ func (ctx *CodeRunnerContext) compileProgram() error {
 
 // compareOutput compares output with test case output.
 func compareOutput(original, output string) TestResult {
-	output = strings.Trim(output, "\n")
-	log.Println(original, output)
 	if original == output {
 		return OK
 	}
@@ -98,31 +96,33 @@ func compareOutput(original, output string) TestResult {
 
 // runTest runs test and return test result with giving CodeRunnerContext.
 // test runs using executable with executablePath file.
-func (ctx *CodeRunnerContext) runTest(test *Test) (TestResult, error) {
-	cmd := exec.Command("./" + ctx.executablePath)
-	input, err := cmd.StdinPipe()
+func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (TestResult, error) {
+	file, err := os.Open(directoryWithTests + "/" + strconv.FormatInt(int64(number), 10) + ".out")
 	if err != nil {
+		log.Fatal(err)
 		return RE, err
 	}
-
-	go func() {
-		defer func(input io.WriteCloser) {
-			err := input.Close()
-			if err != nil {
-				log.Fatal(err)
-			}
-		}(input)
-		_, err := io.WriteString(input, test.input)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
-
+	defer file.Close()
+	original := ""
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		original += scanner.Text() + "\n"
+	}
+	inputFile, err := os.Open(directoryWithTests + "/" + strconv.FormatInt(int64(number), 10) + ".in")
+	if err != nil {
+		log.Fatal(err)
+		return RE, err
+	}
+	defer inputFile.Close()
+	cmd := exec.Command("./" + ctx.executablePath)
+	cmd.Stdin = inputFile
 	output, err := cmd.CombinedOutput()
 	if err != nil {
+		log.Fatalf("%s\n", output)
 		return RE, err
 	}
-	return compareOutput(test.output, string(output)), nil
+
+	return compareOutput(original, string(output)), nil
 }
 
 // removeExecutable removes file that creates after compilation
@@ -134,12 +134,12 @@ func (ctx *CodeRunnerContext) removeExecutable() {
 }
 
 // runPartTests runs part of the tests with the specified start and end indexes.
-func (ctx *CodeRunnerContext) runPartTests(tests []*Test, start, end, number int) {
+func (ctx *CodeRunnerContext) runPartTests(directoryWithTests string, start, end, number int) {
 	for i := start; i < end; i++ {
 		if ctx.failed {
 			break
 		}
-		testResult, err := ctx.runTest(tests[i])
+		testResult, err := ctx.runTest(directoryWithTests, i)
 		if err != nil || testResult != OK {
 			ctx.failed = true
 			ctx.results[number] <- TestingResult{Number: i, Result: testResult, Err: err}
@@ -150,20 +150,20 @@ func (ctx *CodeRunnerContext) runPartTests(tests []*Test, start, end, number int
 }
 
 // Test tests program on given tests and returns result of testing
-func (ctx *CodeRunnerContext) Test(tests []*Test) (TestingResult, error) {
+func (ctx *CodeRunnerContext) Test(directoryWithTests string, testsCount int) (TestingResult, error) {
 	start := time.Now()
 	err := ctx.compileProgram()
 	defer ctx.removeExecutable()
 	if err != nil {
 		return TestingResult{Number: -1, Result: CE}, err
 	}
-	step := len(tests) / ctx.threads // maybe make constant
+	step := testsCount / ctx.threads // maybe make constant
 	var wg sync.WaitGroup
-	for i := 0; i < len(tests); i += step {
+	for i := 0; i < testsCount; i += step {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			ctx.runPartTests(tests, i, i+step, i/step)
+			ctx.runPartTests(directoryWithTests, i, i+step, i/step)
 		}()
 	}
 	wg.Wait()
