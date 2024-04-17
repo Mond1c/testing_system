@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"test_system/config"
 	"test_system/internal"
 
 	"github.com/gofiber/fiber/v2"
@@ -41,6 +42,20 @@ func test(c *fiber.Ctx) error {
 	return nil
 }
 
+type ResponseProblems struct {
+	Problems []string `json:"problems"`
+}
+
+func getProblems(c *fiber.Ctx) error {
+	problems := make([]string, 0, len(config.TestConfig.TestsInfo))
+	for k, _ := range config.TestConfig.TestsInfo {
+		problems = append(problems, k)
+	}
+	err := c.JSON(ResponseProblems{Problems: problems})
+	return err
+}
+
 func InitApi(app *fiber.App) {
 	app.Post("/api/test", test)
+	app.Get("/api/problems", getProblems)
 }

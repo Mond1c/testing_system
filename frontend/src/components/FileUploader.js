@@ -1,6 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const FileUploader = () => {
+  const [problems, setProblems] = useState([]);
+
+  const getProblems = () => {
+    fetch("/api/problems")
+      .then((response) => response.json())
+      .then((response) => setProblems(response["problems"]));
+  };
+
   const sendFile = () => {
     const data = new FormData();
     data.set("file", document.getElementById("file").files[0]);
@@ -14,13 +22,18 @@ const FileUploader = () => {
       .then((response) => console.log(response));
   };
 
+  useEffect(() => getProblems(), []);
+
   return (
     <div>
       <h2>Upload a solution</h2>
       <label for="problem">Problem:</label>
       <select name="problem" id="problem">
-        <option value="A">A</option>
+        {problems.map((problem) => {
+          return <option value={problem}>{problem}</option>;
+        })}
       </select>
+      <br />
       <label for="file">Filename:</label>
       <input type="file" name="file" id="file" />
       <br />
