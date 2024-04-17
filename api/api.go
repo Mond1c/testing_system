@@ -48,7 +48,7 @@ type ResponseProblems struct {
 
 func getProblems(c *fiber.Ctx) error {
 	problems := make([]string, 0, len(config.TestConfig.TestsInfo))
-	for k, _ := range config.TestConfig.TestsInfo {
+	for k := range config.TestConfig.TestsInfo {
 		problems = append(problems, k)
 	}
 	err := c.JSON(ResponseProblems{Problems: problems})

@@ -11,6 +11,7 @@ type Config struct {
 		Path       string `json:"path"`
 		TestsCount int    `json:"count"`
 	} `json:"tests"`
+	OutputPath string
 }
 
 func newConfig() *Config {
