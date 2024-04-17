@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"sync"
+	"test_system/config"
 	"time"
 )
 
@@ -173,9 +174,11 @@ func (ctx *CodeRunnerContext) runPartTests(directoryWithTests string, start, end
 }
 
 // Test tests program on given tests and returns result of testing
-func (ctx *CodeRunnerContext) Test(directoryWithTests string, testsCount int) (TestingResult, error) {
+func (ctx *CodeRunnerContext) Test(directoryWithTests, username, problem string, testsCount int) (TestingResult, error) {
 	start := time.Now()
 	err := ctx.compileProgram()
+	sends, _ := time.Parse(time.RFC3339, config.TestConfig.StartTime)
+	t := time.Since(sends)
 	defer ctx.removeExecutable()
 	if err != nil {
 		return TestingResult{Number: -1, Result: CE}, err
@@ -197,5 +200,9 @@ func (ctx *CodeRunnerContext) Test(directoryWithTests string, testsCount int) (T
 		}
 	}
 	log.Printf("Time elapsed: %v", time.Since(start))
+	log.Printf("Username: %s", username)
+	AddRun(
+		NewRunInfo(LoginContestantId[username], problem, TestingResult{Number: -1, Result: OK}, t),
+	)
 	return TestingResult{Number: -1, Result: OK}, nil
 }

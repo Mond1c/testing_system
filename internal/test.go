@@ -4,7 +4,8 @@ package internal
 type TestResult int
 
 const (
-	OK = TestResult(iota)
+	NONE = TestResult(iota)
+	OK
 	CE
 	RE
 	TL

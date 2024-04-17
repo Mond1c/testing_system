@@ -2,18 +2,30 @@ import React, { useEffect, useState } from "react";
 
 const FileUploader = () => {
   const [problems, setProblems] = useState([]);
+  const [username, setUsername] = useState(undefined);
 
   const getProblems = () => {
     fetch("/api/problems")
       .then((response) => response.json())
-      .then((response) => setProblems(response["problems"]));
+      .then((response) => setProblems(response.problems));
+  };
+
+  const getUsername = () => {
+    fetch("/api/me")
+      .then((response) => response.json())
+      .then((response) => setUsername(response.username));
   };
 
   const sendFile = () => {
+    if (username === undefined) {
+      console.error("Username is undefined");
+      return;
+    }
     const data = new FormData();
     data.set("file", document.getElementById("file").files[0]);
     data.set("language", document.getElementById("language").value);
     data.set("problem", document.getElementById("problem").value);
+    data.set("username", username);
     fetch("/api/test", {
       method: "POST",
       body: data,
@@ -22,10 +34,14 @@ const FileUploader = () => {
       .then((response) => console.log(response));
   };
 
-  useEffect(() => getProblems(), []);
+  useEffect(() => {
+    getUsername();
+    getProblems();
+  }, []);
 
   return (
     <div>
+      <h1>Hello, {username !== undefined ? username : ""}</h1>
       <h2>Upload a solution</h2>
       <label for="problem">Problem:</label>
       <select name="problem" id="problem">

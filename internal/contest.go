@@ -20,11 +20,12 @@ type RunInfo struct {
 }
 
 // NewRunInfo creates pointer of type RunInfo with given RunInfo.Result and RunInfo.Time
-func NewRunInfo(id string, result TestingResult, t time.Duration) *RunInfo {
+func NewRunInfo(id, problem string, result TestingResult, t time.Duration) *RunInfo {
 	return &RunInfo{
-		Id:     id,
-		Result: result,
-		Time:   t,
+		Id:      id,
+		Problem: problem,
+		Result:  result,
+		Time:    t,
 	}
 }
 
@@ -74,13 +75,34 @@ func AddRun(run *RunInfo) {
 	runs = append(runs, run)
 }
 
-func GenerateContestInfo() {
-
+func GenerateContestInfo() error {
+	startTime, err := time.Parse(time.RFC3339, config.TestConfig.StartTime)
+	if err != nil {
+		log.Fatalf("Can't generate contest info becase invalid start time: %v", err)
+		return err
+	}
+	contestants := make(map[string]ContestantInfo)
+	for _, contestant := range config.TestConfig.Contestans {
+		contestants[contestant.Id] = *NewContestantInfo(contestant.Id, contestant.Name)
+	}
+	contest := NewContestInfo(config.TestConfig.Problems, contestants, startTime)
+	log.Printf("%v\n", contest)
+	data, err := json.Marshal(contest)
+	if err != nil {
+		log.Fatalf("Can't encode contest info to json: %v", err)
+		return err
+	}
+	err = os.WriteFile(config.TestConfig.OutputPath, data, 0644)
+	if err != nil {
+		log.Fatalf("Can't write contest info to file: %v", err)
+	}
+	return err
 }
 
 // UpdateContestInfo upates info about the current contest and writes it to the specified json file
 func UpdateContestInfo() {
 	for {
+		log.Println("Starting update contest info!")
 		data, err := os.ReadFile(config.TestConfig.OutputPath)
 		if err != nil {
 			log.Fatalf("Failed to update contest info: %v", err)
@@ -92,11 +114,27 @@ func UpdateContestInfo() {
 			log.Fatalf("Failed to update contest info: %v", err)
 			return
 		}
+		log.Printf("New runs: %d\n", len(runs))
 		for _, run := range runs {
+			log.Printf("Run info: %s %s %d\n", run.Id, run.Problem, run.Result.Result)
 			prevResult := contest.Contestants[run.Id].Results[run.Problem]
+			log.Printf("Prev result: %d", prevResult.Result.Result)
+			contestant := contest.Contestants[run.Id]
 			if prevResult.Result.Result != OK && run.Result.Result == OK {
-				contest.Contestants[run.Id].Results[run.Problem] = *run
+				contestantResults := contestant.Results
+				if contestantResults == nil {
+					contestantResults = make(map[ProblemInfo]RunInfo)
+				}
+				contestantResults[run.Problem] = *run
+				contestant.Results = contestantResults
 			}
+			contestantRuns := contestant.Runs
+			if contestantRuns == nil {
+				contestantRuns = make([]RunInfo, 0)
+			}
+			contestantRuns = append(contestantRuns, *run)
+			contestant.Runs = contestantRuns
+			contest.Contestants[run.Id] = contestant
 		}
 		data, err = json.Marshal(*contest)
 		if err != nil {
@@ -108,6 +146,8 @@ func UpdateContestInfo() {
 			log.Fatalf("Failed to update contest info: %v", err)
 			return
 		}
+		runs = nil
+		log.Println("Ending update contest info!")
 		time.Sleep(time.Millisecond * timeStepForContestUpdateMs)
 	}
 }

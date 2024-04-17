@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/gofiber/template/html/v2"
 )
 
@@ -38,7 +39,9 @@ func main() {
 		Views: engine,
 	})
 	app.Static("/", "./frontend/build")
-
+	app.Use(basicauth.New(basicauth.Config{
+		Users: internal.LoginPassword,
+	}))
 	api.InitApi(app)
 
 	frontendRoutes := []string{
@@ -49,7 +52,10 @@ func main() {
 	for _, route := range frontendRoutes {
 		app.Get(route, Render)
 	}
-
+	err = internal.GenerateContestInfo()
+	if err != nil {
+		return
+	}
 	go internal.UpdateContestInfo()
 
 	err = app.Listen(":" + *port)

@@ -1,9 +1,11 @@
 package api
 
 import (
+	"encoding/base64"
 	"io"
 	"log"
 	"os"
+	"strings"
 	"test_system/config"
 	"test_system/internal"
 
@@ -17,6 +19,7 @@ func test(c *fiber.Ctx) error {
 
 	language := c.FormValue("language")
 	problem := c.FormValue("problem")
+	username := c.FormValue("username")
 
 	file, err := header.Open()
 	if err != nil {
@@ -33,7 +36,7 @@ func test(c *fiber.Ctx) error {
 	internal.CheckForErrorAndSendStatusWithLog(c, err, fiber.StatusInternalServerError)
 	defer internal.RemoveFile(header.Filename)
 
-	ts := internal.NewRun(header.Filename, language, problem)
+	ts := internal.NewRun(header.Filename, language, problem, username)
 	result, err := ts.RunTests()
 	internal.CheckForErrorAndSendStatusWithLog(c, err, fiber.StatusInternalServerError)
 
@@ -55,7 +58,26 @@ func getProblems(c *fiber.Ctx) error {
 	return err
 }
 
+type ResponseMe struct {
+	Username string `json:"username"`
+}
+
+func getMe(c *fiber.Ctx) error {
+	value := strings.Replace(c.GetReqHeaders()["Authorization"][0], "Basic ", "", 1)
+	data, err := base64.StdEncoding.DecodeString(value)
+	if err != nil {
+		log.Fatalf("Can't get username from auth: %v", err)
+		return err
+	}
+	username := strings.Split(string(data), ":")[0]
+	c.JSON(ResponseMe{
+		Username: username,
+	})
+	return nil
+}
+
 func InitApi(app *fiber.App) {
 	app.Post("/api/test", test)
 	app.Get("/api/problems", getProblems)
+	app.Get("/api/me", getMe)
 }

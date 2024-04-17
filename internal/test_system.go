@@ -13,6 +13,7 @@ type Run struct {
 	fileName           string
 	language           string
 	problem            string
+	username           string
 }
 
 // getExecutableName returns name for the executable file and the programming language that was used in the file
@@ -29,12 +30,13 @@ func getExecutableName(fileName, language string) string {
 }
 
 // NewRun creates Run
-func NewRun(fileName, language, problem string) *Run {
+func NewRun(fileName, language, problem, username string) *Run {
 	return &Run{
 		fileName:           fileName,
 		directoryWithTests: "cmd/tests/",
 		language:           language,
 		problem:            problem,
+		username:           username,
 	}
 }
 
@@ -47,5 +49,5 @@ func (ts *Run) RunTests() (TestingResult, error) {
 		log.Fatal(err)
 		return TestingResult{}, err
 	}
-	return ctx.Test(path, count)
+	return ctx.Test(path, ts.username, ts.problem, count)
 }
