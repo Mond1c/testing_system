@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 	"test_system/config"
+	"time"
 )
 
 // Run represents information that need to execute program on the specified tests
@@ -20,7 +21,7 @@ type Run struct {
 func getExecutableName(fileName, language string) string {
 	arr := strings.Split(fileName, ".")
 	if len(arr) != 2 {
-		log.Fatal("file name is invalid")
+		log.Println("file name is invalid")
 		return ""
 	}
 	if language == "java" {
@@ -42,12 +43,19 @@ func NewRun(fileName, language, problem, username string) *Run {
 
 // RunTests runs tests and return the result of testing
 func (ts *Run) RunTests() (TestingResult, error) {
+	sends, _ := time.Parse(time.RFC3339, config.TestConfig.StartTime)
+	duration := int64(time.Since(sends).Minutes())
 	executableName := getExecutableName(ts.fileName, ts.language)
 	ctx := NewCodeRunnerContext(ts.fileName, executableName, ts.language)
 	path, count, err := config.TestConfig.GetTestPathForProblem(ts.problem)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return TestingResult{}, err
 	}
-	return ctx.Test(path, ts.username, ts.problem, count)
+	result, err := ctx.Test(path, count)
+	log.Printf("RESULT: %v", result)
+	AddRun(
+		NewRunInfo(LoginContestantId[ts.username], ts.problem, result, duration),
+	)
+	return result, nil
 }

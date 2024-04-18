@@ -24,7 +24,7 @@ func test(c *fiber.Ctx) error {
 
 	file, err := header.Open()
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		return err
 	}
 	defer file.Close()
@@ -67,7 +67,7 @@ func getMe(c *fiber.Ctx) error {
 	value := strings.Replace(c.GetReqHeaders()["Authorization"][0], "Basic ", "", 1)
 	data, err := base64.StdEncoding.DecodeString(value)
 	if err != nil {
-		log.Fatalf("Can't get username from auth: %v", err)
+		log.Printf("Can't get username from auth: %v", err)
 		return err
 	}
 	username := strings.Split(string(data), ":")[0]
@@ -81,13 +81,13 @@ func getMe(c *fiber.Ctx) error {
 func getResults(c *fiber.Ctx) error {
 	data, err := os.ReadFile(config.TestConfig.OutputPath)
 	if err != nil {
-		log.Fatalf("Can't read file: %v", err)
+		log.Printf("Can't read file: %v", err)
 		return err
 	}
 	var contest internal.ContestInfo
 	err = json.Unmarshal(data, &contest)
 	if err != nil {
-		log.Fatalf("Can't parse output contest info: %v", err)
+		log.Printf("Can't parse output contest info: %v", err)
 		return err
 	}
 	c.JSON(contest)

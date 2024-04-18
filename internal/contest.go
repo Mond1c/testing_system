@@ -31,22 +31,25 @@ func NewRunInfo(id, problem string, result TestingResult, t int64) *RunInfo {
 
 // ContestantInfo represents information about the contestant such as Name, Points, Penalty and information about his Runs.
 type ContestantInfo struct {
-	Id      string                  `json:"id"`
-	Name    string                  `json:"name"`
-	Points  int                     `json:"points"`
-	Penalty int64                   `json:"penalty"`
-	Runs    []RunInfo               `json:"runs"`
-	Results map[ProblemInfo]RunInfo `json:"results"`
+	Id               string                  `json:"id"`
+	Name             string                  `json:"name"`
+	Points           int                     `json:"points"`
+	Penalty          int64                   `json:"penalty"`
+	Runs             []RunInfo               `json:"runs"`
+	Results          map[ProblemInfo]RunInfo `json:"results"`
+	AdditinalPenalty map[ProblemInfo]int64   `json:"additionalPenalty"`
 }
 
 // NewContestantInfo creates pointer of type ContestantInfo
 func NewContestantInfo(id, name string) *ContestantInfo {
 	return &ContestantInfo{
-		Id:      id,
-		Name:    name,
-		Points:  0,
-		Penalty: 0,
-		Runs:    make([]RunInfo, 0),
+		Id:               id,
+		Name:             name,
+		Points:           0,
+		Penalty:          0,
+		Runs:             make([]RunInfo, 0),
+		Results:          make(map[ProblemInfo]RunInfo),
+		AdditinalPenalty: make(map[ProblemInfo]int64),
 	}
 }
 
@@ -79,7 +82,7 @@ func AddRun(run *RunInfo) {
 func GenerateContestInfo() error {
 	startTime, err := time.Parse(time.RFC3339, config.TestConfig.StartTime)
 	if err != nil {
-		log.Fatalf("Can't generate contest info becase invalid start time: %v", err)
+		log.Printf("Can't generate contest info becase invalid start time: %v", err)
 		return err
 	}
 	contestants := make(map[string]ContestantInfo)
@@ -90,12 +93,12 @@ func GenerateContestInfo() error {
 	log.Printf("%v\n", contest)
 	data, err := json.Marshal(contest)
 	if err != nil {
-		log.Fatalf("Can't encode contest info to json: %v", err)
+		log.Printf("Can't encode contest info to json: %v", err)
 		return err
 	}
 	err = os.WriteFile(config.TestConfig.OutputPath, data, 0644)
 	if err != nil {
-		log.Fatalf("Can't write contest info to file: %v", err)
+		log.Printf("Can't write contest info to file: %v", err)
 	}
 	return err
 }
@@ -106,47 +109,44 @@ func UpdateContestInfo() {
 		log.Println("Starting update contest info!")
 		data, err := os.ReadFile(config.TestConfig.OutputPath)
 		if err != nil {
-			log.Fatalf("Failed to update contest info: %v", err)
+			log.Printf("Failed to update contest info: %v", err)
 			return
 		}
 		contest := &ContestInfo{}
 		err = json.Unmarshal(data, &contest)
 		if err != nil {
-			log.Fatalf("Failed to update contest info: %v", err)
+			log.Printf("Failed to update contest info: %v", err)
 			return
 		}
 		for _, run := range runs {
 			prevResult := contest.Contestants[run.Id].Results[run.Problem]
 			contestant := contest.Contestants[run.Id]
+
 			if prevResult.Result.Result != OK && run.Result.Result == OK {
 				contestantResults := contestant.Results
-				if contestantResults == nil {
-					contestantResults = make(map[ProblemInfo]RunInfo)
-				}
 				contestantResults[run.Problem] = *run
 				contestant.Points += 1
-				// TODO: Add penalty
-				contestant.Penalty += run.Time
+				contestant.Penalty += run.Time + contestant.AdditinalPenalty[run.Problem]
 				contestant.Results = contestantResults
 			} else if prevResult.Result.Result != OK && run.Result.Result != OK {
-				contestant.Penalty += 20
+				log.Print(contestant.AdditinalPenalty)
+				contestant.AdditinalPenalty[run.Problem] += 20
 			}
+
 			contestantRuns := contestant.Runs
-			if contestantRuns == nil {
-				contestantRuns = make([]RunInfo, 0)
-			}
+
 			contestantRuns = append(contestantRuns, *run)
 			contestant.Runs = contestantRuns
 			contest.Contestants[run.Id] = contestant
 		}
 		data, err = json.Marshal(*contest)
 		if err != nil {
-			log.Fatalf("Failed to update contest info: %v", err)
+			log.Printf("Failed to update contest info: %v", err)
 			return
 		}
 		err = os.WriteFile(config.TestConfig.OutputPath, data, 0644)
 		if err != nil {
-			log.Fatalf("Failed to update contest info: %v", err)
+			log.Printf("Failed to update contest info: %v", err)
 			return
 		}
 		runs = nil
