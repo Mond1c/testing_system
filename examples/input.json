@@ -1,0 +1,65 @@
+{
+  "tests": {
+    "A": {
+      "path": "cmd/tests",
+      "count": 1000
+    },
+    "B": {
+      "path": "cmd/tests",
+      "count": 1000
+    },
+    "C": {
+      "path": "cmd/tests",
+      "count": 1000
+    },
+    "D": {
+      "path": "cmd/tests",
+      "count": 1000
+    },
+    "E": {
+      "path": "cmd/tests",
+      "count": 1000
+    },
+    "F": {
+      "path": "cmd/tests",
+      "count": 1000
+    },
+    "G": {
+      "path": "cmd/tests",
+      "count": 1000
+    },
+    "H": {
+      "path": "cmd/tests",
+      "count": 1000
+    },
+    "I": {
+      "path": "cmd/tests",
+      "count": 1000
+    }
+  },
+  "outputPath": "output.json",
+  "startTime": "2024-04-18T10:00:00Z",
+  "contestants": [
+    {
+      "id": "1",
+      "name": "Test1"
+    },
+    {
+      "id": "2",
+      "name": "Test2"
+    },
+    {
+      "id": "3",
+      "name": "Test3"
+    },
+    {
+      "id": "4",
+      "name": "Test4"
+    },
+    {
+      "id": "5",
+      "name": "Test5"
+    }
+  ],
+  "problems": ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
+}
