@@ -33,7 +33,12 @@ const Results = () => {
     ) {
       const result = contestant.results[problem].result.result;
       if (result === 1) {
-        return <TableElementWrapper>+</TableElementWrapper>;
+        const penalty = contestant.additionalPenalty[problem] / 20;
+        return (
+          <TableElementWrapper>
+            +{penalty > 0 ? penalty : ""}
+          </TableElementWrapper>
+        );
       }
       return <TableElementWrapper>-</TableElementWrapper>;
     }
