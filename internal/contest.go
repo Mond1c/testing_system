@@ -103,6 +103,7 @@ func GenerateContestInfo() error {
 	return err
 }
 
+// TODO: try to decrease memory allocation (maybe use jsonparse)
 // UpdateContestInfo upates info about the current contest and writes it to the specified json file
 func UpdateContestInfo() {
 	for {
