@@ -178,7 +178,7 @@ func (ctx *CodeRunnerContext) Test(directoryWithTests, username, problem string,
 	start := time.Now()
 	err := ctx.compileProgram()
 	sends, _ := time.Parse(time.RFC3339, config.TestConfig.StartTime)
-	t := time.Since(sends)
+	t := int64(time.Since(sends).Minutes())
 	defer ctx.removeExecutable()
 	if err != nil {
 		return TestingResult{Number: -1, Result: CE}, err

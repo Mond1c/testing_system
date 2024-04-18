@@ -16,11 +16,11 @@ type RunInfo struct {
 	Id      string        `json:"id"`
 	Problem ProblemInfo   `json:"problem"`
 	Result  TestingResult `json:"result"`
-	Time    time.Duration `json:"time"`
+	Time    int64         `json:"time"`
 }
 
 // NewRunInfo creates pointer of type RunInfo with given RunInfo.Result and RunInfo.Time
-func NewRunInfo(id, problem string, result TestingResult, t time.Duration) *RunInfo {
+func NewRunInfo(id, problem string, result TestingResult, t int64) *RunInfo {
 	return &RunInfo{
 		Id:      id,
 		Problem: problem,
@@ -34,7 +34,7 @@ type ContestantInfo struct {
 	Id      string                  `json:"id"`
 	Name    string                  `json:"name"`
 	Points  int                     `json:"points"`
-	Penalty int                     `json:"penalty"`
+	Penalty int64                   `json:"penalty"`
 	Runs    []RunInfo               `json:"runs"`
 	Results map[ProblemInfo]RunInfo `json:"results"`
 }
@@ -126,7 +126,10 @@ func UpdateContestInfo() {
 				contestantResults[run.Problem] = *run
 				contestant.Points += 1
 				// TODO: Add penalty
+				contestant.Penalty += run.Time
 				contestant.Results = contestantResults
+			} else if prevResult.Result.Result != OK && run.Result.Result != OK {
+				contestant.Penalty += 20
 			}
 			contestantRuns := contestant.Runs
 			if contestantRuns == nil {
