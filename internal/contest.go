@@ -75,6 +75,7 @@ func AddRun(run *RunInfo) {
 	runs = append(runs, run)
 }
 
+// GenerateContestInfo generates default contest info json file with the specified config
 func GenerateContestInfo() error {
 	startTime, err := time.Parse(time.RFC3339, config.TestConfig.StartTime)
 	if err != nil {
@@ -114,11 +115,8 @@ func UpdateContestInfo() {
 			log.Fatalf("Failed to update contest info: %v", err)
 			return
 		}
-		log.Printf("New runs: %d\n", len(runs))
 		for _, run := range runs {
-			log.Printf("Run info: %s %s %d\n", run.Id, run.Problem, run.Result.Result)
 			prevResult := contest.Contestants[run.Id].Results[run.Problem]
-			log.Printf("Prev result: %d", prevResult.Result.Result)
 			contestant := contest.Contestants[run.Id]
 			if prevResult.Result.Result != OK && run.Result.Result == OK {
 				contestantResults := contestant.Results
