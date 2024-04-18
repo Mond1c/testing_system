@@ -52,7 +52,7 @@ func (ts *Run) RunTests() (TestingResult, error) {
 		log.Println(err)
 		return TestingResult{}, err
 	}
-	result, err := ctx.Test(path, count)
+	result, _ := ctx.Test(path, count)
 	log.Printf("RESULT: %v", result)
 	AddRun(
 		NewRunInfo(LoginContestantId[ts.username], ts.problem, result, duration),

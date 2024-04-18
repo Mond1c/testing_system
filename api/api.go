@@ -71,7 +71,7 @@ func getMe(c *fiber.Ctx) error {
 		return err
 	}
 	username := strings.Split(string(data), ":")[0]
-	c.JSON(ResponseMe{
+	_ = c.JSON(ResponseMe{
 		Username: username,
 	})
 	return nil
@@ -90,7 +90,7 @@ func getResults(c *fiber.Ctx) error {
 		log.Printf("Can't parse output contest info: %v", err)
 		return err
 	}
-	c.JSON(contest)
+	_ = c.JSON(contest)
 	return nil
 }
 
