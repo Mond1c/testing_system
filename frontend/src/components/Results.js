@@ -27,7 +27,10 @@ const Results = () => {
   useEffect(() => getResults(), []);
 
   const getBestResult = (contestant, problem) => {
-    if (contestant.results[problem] !== undefined) {
+    if (
+      contestant.results != null &&
+      contestant.results[problem] !== undefined
+    ) {
       const result = contestant.results[problem].result.result;
       if (result === 1) {
         return <TableElementWrapper>+</TableElementWrapper>;

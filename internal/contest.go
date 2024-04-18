@@ -124,6 +124,8 @@ func UpdateContestInfo() {
 					contestantResults = make(map[ProblemInfo]RunInfo)
 				}
 				contestantResults[run.Problem] = *run
+				contestant.Points += 1
+				// TODO: Add penalty
 				contestant.Results = contestantResults
 			}
 			contestantRuns := contestant.Runs
