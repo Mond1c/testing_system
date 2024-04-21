@@ -46,3 +46,4 @@ func (c *Config) GetTestPathForProblem(problem string) (string, int, error) {
 }
 
 var TestConfig *Config
+var TestDir string = "temp"

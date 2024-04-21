@@ -44,52 +44,18 @@ func (t *TestingResult) GetString() string {
 	return fmt.Sprintf("Test with number %d: %s", t.Number, t.Result.GetString())
 }
 
-func (ctx *CodeRunnerContext) makeExecutable() error {
-	_, err := exec.Command("chmod", "+x", ctx.executablePath).Output()
-	return err
-}
-
-// compileCpp compiles source code written on C++ to executable file
-func (ctx *CodeRunnerContext) compileCpp() error {
-	_, err := exec.Command("g++", "-std=c++20", "-o", ctx.executablePath, ctx.filePath).Output()
-	if err != nil {
-		return err
-	}
-	return ctx.makeExecutable()
-}
-
-// TODO: java runs very slow, need to fix
-// compilesJava compiles source code written on Java to executable file
-func (ctx *CodeRunnerContext) compileJava() error {
-	_, err := exec.Command("javac", ctx.filePath).Output()
-	return err
-}
-
-// compileGo compiles source code written on Go to executable file
-func (ctx *CodeRunnerContext) compileGo() error {
-	_, err := exec.Command("go", "build", "-o", ctx.executablePath, ctx.filePath).Output()
-	if err != nil {
-		return err
-	}
-	return ctx.makeExecutable()
-}
-
 // compileProgram compiles source code to executable file using giving CodeRunnerContext.
 // Using specific compiler based on given language.
 func (ctx *CodeRunnerContext) compileProgram() error {
 	if _, err := os.Stat(ctx.filePath); os.IsNotExist(err) {
 		return err
 	}
-	switch ctx.language {
-	case "cpp":
-		return ctx.compileCpp()
-	case "go":
-		return ctx.compileGo()
-	case "java":
-		return ctx.compileJava()
-	default:
-		return fmt.Errorf("unsupported language: %s", ctx.language)
+	if fileName, ok := LangaugesConfig.CompileFiles[ctx.language]; ok {
+		_, err := exec.Command("sh", fileName, ctx.filePath, ctx.executablePath).Output()
+		log.Printf("FileName: %v, path: %v, execPath: %v, err: %v", fileName, ctx.filePath, ctx.executablePath, err)
+		return err
 	}
+	return fmt.Errorf("unsupported language: %s", ctx.language)
 }
 
 // compareOutput compares output with test case output.

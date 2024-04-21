@@ -10,11 +10,10 @@ import (
 
 // Run represents information that need to execute program on the specified tests
 type Run struct {
-	directoryWithTests string
-	fileName           string
-	language           string
-	problem            string
-	username           string
+	fileName string
+	language string
+	problem  string
+	username string
 }
 
 // getExecutableName returns name for the executable file and the programming language that was used in the file
@@ -33,11 +32,10 @@ func getExecutableName(fileName, language string) string {
 // NewRun creates Run
 func NewRun(fileName, language, problem, username string) *Run {
 	return &Run{
-		fileName:           fileName,
-		directoryWithTests: "cmd/tests/",
-		language:           language,
-		problem:            problem,
-		username:           username,
+		fileName: fileName,
+		language: language,
+		problem:  problem,
+		username: username,
 	}
 }
 

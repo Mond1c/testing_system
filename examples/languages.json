@@ -1,0 +1,8 @@
+{
+    "names": ["cpp", "java", "go"],
+    "compileFiles": {
+        "cpp": "examples/cpp.sh",
+        "java": "examples/java.sh",
+        "go": "examples/go.sh"
+    }
+}

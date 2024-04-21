@@ -29,15 +29,14 @@ func test(c *fiber.Ctx) error {
 	}
 	defer file.Close()
 
-	out, err := os.Create(header.Filename)
+	out, err := os.Create(config.TestDir + "/" + header.Filename)
 	internal.CheckForErrorAndSendStatusWithLog(c, err, fiber.StatusInternalServerError)
 	defer out.Close()
 
 	_, err = io.Copy(out, file)
 	internal.CheckForErrorAndSendStatusWithLog(c, err, fiber.StatusInternalServerError)
-	defer internal.RemoveFile(header.Filename)
 
-	ts := internal.NewRun(header.Filename, language, problem, username)
+	ts := internal.NewRun(config.TestDir+"/"+header.Filename, language, problem, username)
 	result, err := ts.RunTests()
 	internal.CheckForErrorAndSendStatusWithLog(c, err, fiber.StatusInternalServerError)
 
@@ -82,15 +81,36 @@ func getResults(c *fiber.Ctx) error {
 	data, err := os.ReadFile(config.TestConfig.OutputPath)
 	if err != nil {
 		log.Printf("Can't read file: %v", err)
-		return err
+		return nil
 	}
 	var contest internal.ContestInfo
 	err = json.Unmarshal(data, &contest)
 	if err != nil {
 		log.Printf("Can't parse output contest info: %v", err)
-		return err
+		return nil
 	}
 	_ = c.JSON(contest)
+	return nil
+}
+
+func getRuns(c *fiber.Ctx) error {
+	data, err := os.ReadFile(config.TestConfig.OutputPath)
+	if err != nil {
+		log.Printf("Can't read file: %v", err)
+		return nil
+	}
+	var contest internal.ContestInfo
+	err = json.Unmarshal(data, &contest)
+	if err != nil {
+		log.Printf("Can't parse output contest info: %v", err)
+		return nil
+	}
+	_ = c.JSON(contest.Contestants[c.Query("id", "")].Runs)
+	return nil
+}
+
+func getLanguages(c *fiber.Ctx) error {
+	_ = c.JSON(internal.LangaugesConfig.GetLanguages())
 	return nil
 }
 
@@ -99,4 +119,5 @@ func InitApi(app *fiber.App) {
 	app.Get("/api/problems", getProblems)
 	app.Get("/api/me", getMe)
 	app.Get("/api/results", getResults)
+	app.Get("/api/languages", getLanguages)
 }
