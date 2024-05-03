@@ -10,7 +10,6 @@ const (
 	RE
 	TL
 	ML
-	UB
 	WA
 )
 
@@ -27,8 +26,6 @@ func (t *TestResult) GetString() string {
 		return "Time limit"
 	case ML:
 		return "Memory limit"
-	case UB:
-		return "Something went wrong"
 	default:
 		return "Unexpected result"
 	}

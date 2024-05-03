@@ -1,9 +1,20 @@
 import React, { useEffect, useState } from "react";
 
+const Results = {
+  0: "Undefined behaviour",
+  1: "OK",
+  2: "Compile error",
+  3: "Runtime error",
+  4: "Time limit",
+  5: "Memory limit",
+  6: "Wrong answer"
+};
+
 const FileUploader = () => {
   const [problems, setProblems] = useState([]);
   const [username, setUsername] = useState(undefined);
   const [languages, setLanguages] = useState([]);
+  const [verdict, setVerdict] = useState("");
 
   const getProblems = () => {
     fetch("/api/problems")
@@ -41,7 +52,14 @@ const FileUploader = () => {
       body: data,
     })
       .then((response) => response.json())
-      .then((response) => console.log(response));
+      .then((response) => {
+        const result = Results[response.result];
+        if (response.number > -1) {
+          setVerdict(result + " on test " + (response.number + 1));
+        } else {
+          setVerdict(result);
+        }
+      });
   };
 
   useEffect(() => {
@@ -72,6 +90,9 @@ const FileUploader = () => {
           return <option value={lang.value}>{lang.name}</option>;
         })}
       </select>
+
+      <br />
+      <h1>Verdict: {verdict}</h1>
     </div>
   );
 };
