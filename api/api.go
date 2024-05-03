@@ -93,21 +93,21 @@ func getResults(c *fiber.Ctx) error {
 	return nil
 }
 
-func getRuns(c *fiber.Ctx) error {
-	data, err := os.ReadFile(config.TestConfig.OutputPath)
-	if err != nil {
-		log.Printf("Can't read file: %v", err)
-		return nil
-	}
-	var contest internal.ContestInfo
-	err = json.Unmarshal(data, &contest)
-	if err != nil {
-		log.Printf("Can't parse output contest info: %v", err)
-		return nil
-	}
-	_ = c.JSON(contest.Contestants[c.Query("id", "")].Runs)
-	return nil
-}
+// func getRuns(c *fiber.Ctx) error {
+// 	data, err := os.ReadFile(config.TestConfig.OutputPath)
+// 	if err != nil {
+// 		log.Printf("Can't read file: %v", err)
+// 		return nil
+// 	}
+// 	var contest internal.ContestInfo
+// 	err = json.Unmarshal(data, &contest)
+// 	if err != nil {
+// 		log.Printf("Can't parse output contest info: %v", err)
+// 		return nil
+// 	}
+// 	_ = c.JSON(contest.Contestants[c.Query("id", "")].Runs)
+// 	return nil
+// }
 
 // Sends json with languages information.
 func getLanguages(c *fiber.Ctx) error {
