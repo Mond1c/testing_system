@@ -93,21 +93,26 @@ func getResults(c *fiber.Ctx) error {
 	return nil
 }
 
-// func getRuns(c *fiber.Ctx) error {
-// 	data, err := os.ReadFile(config.TestConfig.OutputPath)
-// 	if err != nil {
-// 		log.Printf("Can't read file: %v", err)
-// 		return nil
-// 	}
-// 	var contest internal.ContestInfo
-// 	err = json.Unmarshal(data, &contest)
-// 	if err != nil {
-// 		log.Printf("Can't parse output contest info: %v", err)
-// 		return nil
-// 	}
-// 	_ = c.JSON(contest.Contestants[c.Query("id", "")].Runs)
-// 	return nil
-// }
+func getRuns(c *fiber.Ctx) error {
+	data, err := os.ReadFile(config.TestConfig.OutputPath)
+	if err != nil {
+		log.Printf("Can't read file: %v", err)
+		return nil
+	}
+	var contest internal.ContestInfo
+	err = json.Unmarshal(data, &contest)
+	if err != nil {
+		log.Printf("Can't parse output contest info: %v", err)
+		return nil
+	}
+	id, ok := internal.LoginContestantId[c.Query("name")]
+	if !ok {
+		log.Print("can't find contestant with this login")
+		return nil
+	}
+	_ = c.JSON(contest.Contestants[id].Runs)
+	return nil
+}
 
 // Sends json with languages information.
 func getLanguages(c *fiber.Ctx) error {
@@ -122,4 +127,5 @@ func InitApi(app *fiber.App) {
 	app.Get("/api/me", getMe)
 	app.Get("/api/results", getResults)
 	app.Get("/api/languages", getLanguages)
+	app.Get("/api/runs", getRuns)
 }

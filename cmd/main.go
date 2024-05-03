@@ -63,6 +63,7 @@ func main() {
 		"/",
 		"/upload",
 		"/results",
+		"/runs",
 	}
 
 	for _, route := range frontendRoutes {
