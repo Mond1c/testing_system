@@ -1,4 +1,18 @@
 {
+    "languages": [
+        {
+            "name": "C++ 20",
+            "value": "cpp"
+        },
+        {
+            "name": "Go 1.21",
+            "value": "go"
+        },
+        {
+            "name": "Java 21",
+            "value": "java"
+        }
+    ],
     "names": ["cpp", "java", "go"],
     "compileFiles": {
         "cpp": "examples/cpp.sh",

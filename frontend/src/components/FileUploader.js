@@ -3,11 +3,21 @@ import React, { useEffect, useState } from "react";
 const FileUploader = () => {
   const [problems, setProblems] = useState([]);
   const [username, setUsername] = useState(undefined);
+  const [languages, setLanguages] = useState([]);
 
   const getProblems = () => {
     fetch("/api/problems")
       .then((response) => response.json())
-      .then((response) => setProblems(response.problems));
+      .then((response) => {
+        response.problems.sort();
+        setProblems(response.problems);
+      });
+  };
+
+  const getLanguages = () => {
+    fetch("/api/languages")
+      .then(response => response.json())
+      .then(response => setLanguages(response));
   };
 
   const getUsername = () => {
@@ -37,6 +47,7 @@ const FileUploader = () => {
   useEffect(() => {
     getUsername();
     getProblems();
+    getLanguages();
   }, []);
 
   return (
@@ -57,9 +68,9 @@ const FileUploader = () => {
       <br />
       <label for="language">Language:</label>
       <select name="language" id="language">
-        <option value="cpp">C++ 20</option>
-        <option value="java">Java 21</option>
-        <option value="go">Go 1.21</option>
+        {languages.map(lang => {
+          return <option value={lang.value}>{lang.name}</option>;
+        })}
       </select>
     </div>
   );

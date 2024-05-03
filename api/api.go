@@ -109,8 +109,10 @@ func getRuns(c *fiber.Ctx) error {
 	return nil
 }
 
+// Sends json with languages information.
 func getLanguages(c *fiber.Ctx) error {
 	_ = c.JSON(internal.LangaugesConfig.GetLanguages())
+	log.Printf("%v", internal.LangaugesConfig.GetLanguages())
 	return nil
 }
 

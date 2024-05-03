@@ -6,8 +6,13 @@ import (
 	"os"
 )
 
+type Language struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
 type Languages struct {
-	Names        []string          `json:"names"`
+	Langs        []Language        `json:"languages"`
 	CompileFiles map[string]string `json:"compileFiles"`
 }
 
@@ -15,8 +20,8 @@ func newLanguages() *Languages {
 	return &Languages{}
 }
 
-func (l *Languages) GetLanguages() []string {
-	return l.Names
+func (l *Languages) GetLanguages() []Language {
+	return l.Langs
 }
 
 func (l *Languages) GetCompileFileName(language string) string {
