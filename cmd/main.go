@@ -7,11 +7,15 @@ import (
 	"test_system/api"
 	"test_system/config"
 	"test_system/internal"
+	"time"
 
 	"flag"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/template/html/v2"
 )
 
@@ -34,7 +38,7 @@ func getBasicAuth() map[string]string {
 }
 
 func main() {
-	port := flag.String("flag", "8080", "port for the server")
+	port := flag.String("port", "8080", "port for the server")
 	configPath := flag.String("config", "", "path to the config file")
 	langaugesPath := flag.String("languages", "", "path to the languages settings file")
 	generateOutput := flag.Bool("generate", false, "set it if you want generate output json file (turn on on first run)")
@@ -64,6 +68,14 @@ func main() {
 	app.Static("/", "./frontend/build")
 	app.Use(basicauth.New(basicauth.Config{
 		Users: getBasicAuth(),
+	}))
+	app.Use(pprof.New())
+	app.Use(logger.New(logger.Config{
+		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}\n",
+	}))
+	app.Use(limiter.New(limiter.Config{
+		Max:        30,
+		Expiration: 10 * time.Second,
 	}))
 	api.InitApi(app)
 

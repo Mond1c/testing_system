@@ -11,6 +11,7 @@ import (
 	"test_system/internal"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
 )
 
 // test tests uploading file with source code for correct working
@@ -25,7 +26,7 @@ func test(c *fiber.Ctx) error {
 	file, err := header.Open()
 	if err != nil {
 		log.Print(err)
-		return err
+		return nil
 	}
 	defer file.Close()
 
@@ -128,4 +129,5 @@ func InitApi(app *fiber.App) {
 	app.Get("/api/results", getResults)
 	app.Get("/api/languages", getLanguages)
 	app.Get("/api/runs", getRuns)
+	app.Get("/api/monitor", monitor.New())
 }

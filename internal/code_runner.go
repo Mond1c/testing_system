@@ -143,8 +143,8 @@ func (ctx *CodeRunnerContext) Test(directoryWithTests string, testsCount int) (T
 	start := time.Now()
 	err := ctx.compileProgram()
 	defer ctx.removeExecutable()
-	log.Println(err)
 	if err != nil {
+		log.Println(err)
 		return TestingResult{Number: -1, Result: CE}, err
 	}
 	step := testsCount / ctx.threads // maybe make constant

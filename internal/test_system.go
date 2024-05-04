@@ -47,7 +47,6 @@ func (ts *Run) RunTests() (TestingResult, error) {
 	ctx := NewCodeRunnerContext(ts.fileName, executableName, ts.language)
 	path, count, err := config.TestConfig.GetTestPathForProblem(ts.problem)
 	if err != nil {
-		log.Println(err)
 		return TestingResult{}, err
 	}
 	result, _ := ctx.Test(path, count)
