@@ -116,7 +116,6 @@ func GenerateContestInfo() error {
 	return err
 }
 
-// TODO: try to decrease memory allocation (maybe use jsonparse)
 // UpdateContestInfo upates info about the current contest and writes it to the specified json file
 func UpdateContestInfo() {
 	if Contest == nil {
@@ -132,14 +131,11 @@ func UpdateContestInfo() {
 	for {
 		log.Println("Starting update contest info!")
 		data, err := json.Marshal(*Contest)
-		if err != nil {
-			log.Printf("Failed to update contest info: %v", err)
-			return
+		if err == nil {
+			err = os.WriteFile(config.TestConfig.OutputPath, data, 0644)
 		}
-		err = os.WriteFile(config.TestConfig.OutputPath, data, 0644)
 		if err != nil {
 			log.Printf("Failed to update contest info: %v", err)
-			return
 		}
 		log.Println("Ending update contest info!")
 		time.Sleep(time.Millisecond * timeStepForContestUpdateMs)
