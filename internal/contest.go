@@ -73,8 +73,6 @@ func NewContestInfo(problems []ProblemInfo, contestants map[string]*ContestantIn
 
 const timeStepForContestUpdateMs = 10000
 
-var runs []*RunInfo
-
 // AddRun adds new run for the current contest
 func AddRun(run *RunInfo) {
 	prevResult := Contest.Contestants[run.Id].Results[run.Problem]
