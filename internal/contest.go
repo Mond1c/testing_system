@@ -141,7 +141,6 @@ func UpdateContestInfo() {
 			log.Printf("Failed to update contest info: %v", err)
 			return
 		}
-		runs = nil
 		log.Println("Ending update contest info!")
 		time.Sleep(time.Millisecond * timeStepForContestUpdateMs)
 	}

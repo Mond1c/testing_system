@@ -37,7 +37,6 @@ func NewCodeRunnerContext(filePath, executablePath, language string) *CodeRunner
 type TestingResult struct {
 	Number int        `json:"number"`
 	Result TestResult `json:"result"`
-	Err    error
 }
 
 func (t *TestingResult) GetString() string {
@@ -131,11 +130,12 @@ func (ctx *CodeRunnerContext) runPartTests(directoryWithTests string, start, end
 		testResult, err := ctx.runTest(directoryWithTests, i)
 		if err != nil || testResult != OK {
 			ctx.failed = true
-			ctx.results[number] <- TestingResult{Number: i, Result: testResult, Err: err}
+			log.Print(err)
+			ctx.results[number] <- TestingResult{Number: i, Result: testResult}
 			return
 		}
 	}
-	ctx.results[number] <- TestingResult{Number: -1, Result: OK, Err: nil}
+	ctx.results[number] <- TestingResult{Number: -1, Result: OK}
 }
 
 // Test tests program on given tests and returns result of testing
@@ -159,8 +159,8 @@ func (ctx *CodeRunnerContext) Test(directoryWithTests string, testsCount int) (T
 	wg.Wait()
 	for i := 0; i < ctx.threads; i++ {
 		result := <-ctx.results[i]
-		if result.Result != OK || result.Err != nil {
-			return result, result.Err
+		if result.Result != OK {
+			return result, nil
 		}
 	}
 	log.Printf("Time elapsed: %v", time.Since(start))
