@@ -14,14 +14,26 @@ const TableElementWrapper = styled.td`
   text-align: center;
 `;
 
-const Results = () => {
-  const [results, setResults] = useState({});
+const Results = () => {  
+  const [results, setResults] = useState([]);
+  const [problems, setProblems] = useState([]);
 
   const getResults = () => {
     console.log("Results getting");
     fetch("/api/results")
       .then((response) => response.json())
-      .then((response) => setResults(response));
+      .then((response) => {
+        setProblems(response.problems);
+        const res = Object.values(response.contestants);
+        console.log(res);
+        res.sort((a, b) => {
+          if (a.points === b.points) {
+            return a.penalty - b.penalty;
+          }
+          return b.points - a.points;
+        })
+        setResults(res)
+      });
   };
 
   useEffect(() => getResults(), []);
@@ -46,12 +58,13 @@ const Results = () => {
   };
 
   const getContestants = (contestants) => {
-    return Object.entries(contestants)?.map(([_, contestant]) => {
+    console.log(contestants);
+    return contestants.map((contestant) => {
       return (
         <tr>
           <TableElementWrapper>{contestant.id}</TableElementWrapper>
           <TableElementWrapper>{contestant.name}</TableElementWrapper>
-          {results.problems.map((problem) => {
+          {problems.map((problem) => {
             return getBestResult(contestant, problem);
           })}
           <TableElementWrapper>{contestant.points}</TableElementWrapper>
@@ -68,15 +81,15 @@ const Results = () => {
         <tr>
           <TableHeaderWrapper>Id</TableHeaderWrapper>
           <TableHeaderWrapper>Name</TableHeaderWrapper>
-          {results?.problems?.map((problem) => {
+          {problems.map((problem) => {
             console.log(results);
             return <TableHeaderWrapper>{problem}</TableHeaderWrapper>;
           })}
           <TableHeaderWrapper>Score</TableHeaderWrapper>
           <TableHeaderWrapper>Penalty</TableHeaderWrapper>
         </tr>
-        {results?.contestants !== undefined
-          ? getContestants(results?.contestants)
+        {results !== undefined
+          ? getContestants(results)
           : ""}
       </TableWrapper>
     </div>

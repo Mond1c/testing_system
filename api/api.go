@@ -120,13 +120,14 @@ func getRuns(c *fiber.Ctx) error {
 	return nil
 }
 
-// Sends json with languages information.
+// getLanguages sends json with languages information.
 func getLanguages(c *fiber.Ctx) error {
 	_ = c.JSON(internal.LangaugesConfig.GetLanguages())
 	log.Printf("%v", internal.LangaugesConfig.GetLanguages())
 	return nil
 }
 
+// getContestInfo sends json with the current contest info
 func getContestInfo(c *fiber.Ctx) error {
 	_ = c.JSON(internal.Contest)
 	return nil
