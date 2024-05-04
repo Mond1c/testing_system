@@ -53,7 +53,7 @@ func (ts *Run) RunTests() (TestingResult, error) {
 	result, _ := ctx.Test(path, count)
 	log.Printf("RESULT: %v", result)
 	AddRun(
-		NewRunInfo(LoginContestantId[ts.username], ts.problem, result, duration),
+		NewRunInfo(config.TestConfig.Credentials[ts.username].Id, ts.problem, result, duration),
 	)
 	return result, nil
 }

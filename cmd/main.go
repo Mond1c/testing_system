@@ -25,6 +25,14 @@ func CheckIfFileExists(path string) {
 	}
 }
 
+func getBasicAuth() map[string]string {
+	data := make(map[string]string)
+	for k, v := range config.TestConfig.Credentials {
+		data[k] = v.Password
+	}
+	return data
+}
+
 func main() {
 	port := flag.String("flag", "8080", "port for the server")
 	configPath := flag.String("config", "", "path to the config file")
@@ -55,7 +63,7 @@ func main() {
 	})
 	app.Static("/", "./frontend/build")
 	app.Use(basicauth.New(basicauth.Config{
-		Users: internal.LoginPassword,
+		Users: getBasicAuth(),
 	}))
 	api.InitApi(app)
 

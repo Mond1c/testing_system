@@ -105,12 +105,12 @@ func getRuns(c *fiber.Ctx) error {
 		log.Printf("Can't parse output contest info: %v", err)
 		return nil
 	}
-	id, ok := internal.LoginContestantId[c.Query("name")]
+	id, ok := config.TestConfig.Credentials[c.Query("name")]
 	if !ok {
 		log.Print("can't find contestant with this login")
 		return nil
 	}
-	_ = c.JSON(contest.Contestants[id].Runs)
+	_ = c.JSON(contest.Contestants[id.Id].Runs)
 	return nil
 }
 

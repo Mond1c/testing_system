@@ -61,5 +61,27 @@
       "name": "Test5"
     }
   ],
+  "credentials": {
+    "admin": {
+      "id": "1",
+      "password": "admin"
+    },
+    "test2": {
+      "id": "2",
+      "password": "test"
+    },
+    "test3": {
+      "id": "3",
+      "password": "test"
+    },
+    "test4": {
+      "id": "4",
+      "password": "test"
+    },
+    "test5": {
+      "id": "5",
+      "password": "test"
+    }
+  },
   "problems": ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
 }

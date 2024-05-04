@@ -17,6 +17,10 @@ type Config struct {
 		Id   string `json:"id"`
 		Name string `json:"name"`
 	} `json:"contestants"`
+	Credentials map[string]struct {
+		Id       string `json:"id"`
+		Password string `json:"password"`
+	} `json:"credentials"`
 	Problems []string `json:"problems"`
 }
 
