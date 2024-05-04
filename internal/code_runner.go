@@ -106,7 +106,7 @@ func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (Te
 	cmd.Stdin = inputFile
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("%s\n", output)
+		log.Print(output)
 		return RE, err
 	}
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"sync"
 	"test_system/config"
 	"time"
 )
@@ -38,6 +39,7 @@ type ContestantInfo struct {
 	Runs             []RunInfo               `json:"runs"`
 	Results          map[ProblemInfo]RunInfo `json:"results"`
 	AdditinalPenalty map[ProblemInfo]int64   `json:"additionalPenalty"`
+	mu               sync.Mutex
 }
 
 // NewContestantInfo creates pointer of type ContestantInfo
@@ -55,13 +57,13 @@ func NewContestantInfo(id, name string) *ContestantInfo {
 
 // ContestInfo represents information about contest such as Problems names, Contestants information and StartTime of the contest
 type ContestInfo struct {
-	Problems    []ProblemInfo             `json:"problems"`
-	Contestants map[string]ContestantInfo `json:"contestants"`
-	StartTime   time.Time                 `json:"start_time"`
+	Problems    []ProblemInfo              `json:"problems"`
+	Contestants map[string]*ContestantInfo `json:"contestants"`
+	StartTime   time.Time                  `json:"start_time"`
 }
 
 // NewContestInfo creates pointer of type ContestInfo
-func NewContestInfo(problems []ProblemInfo, contestants map[string]ContestantInfo, startTime time.Time) *ContestInfo {
+func NewContestInfo(problems []ProblemInfo, contestants map[string]*ContestantInfo, startTime time.Time) *ContestInfo {
 	return &ContestInfo{
 		Problems:    problems,
 		Contestants: contestants,
@@ -75,7 +77,20 @@ var runs []*RunInfo
 
 // AddRun adds new run for the current contest
 func AddRun(run *RunInfo) {
-	runs = append(runs, run)
+	prevResult := Contest.Contestants[run.Id].Results[run.Problem]
+	Contest.Contestants[run.Id].mu.Lock()
+
+	if prevResult.Result.Result != OK && run.Result.Result == OK {
+		Contest.Contestants[run.Id].Results[run.Problem] = *run
+		Contest.Contestants[run.Id].Points += 1
+		Contest.Contestants[run.Id].Penalty += run.Time + Contest.Contestants[run.Id].AdditinalPenalty[run.Problem]
+	} else if prevResult.Result.Result != OK && run.Result.Result != OK {
+		log.Print(Contest.Contestants[run.Id].AdditinalPenalty)
+		Contest.Contestants[run.Id].AdditinalPenalty[run.Problem] += 20
+	}
+
+	Contest.Contestants[run.Id].Runs = append(Contest.Contestants[run.Id].Runs, *run)
+	Contest.Contestants[run.Id].mu.Unlock()
 }
 
 // GenerateContestInfo generates default contest info json file with the specified config
@@ -85,9 +100,9 @@ func GenerateContestInfo() error {
 		log.Printf("Can't generate contest info becase invalid start time: %v", err)
 		return err
 	}
-	contestants := make(map[string]ContestantInfo)
+	contestants := make(map[string]*ContestantInfo)
 	for _, contestant := range config.TestConfig.Contestans {
-		contestants[contestant.Id] = *NewContestantInfo(contestant.Id, contestant.Name)
+		contestants[contestant.Id] = NewContestantInfo(contestant.Id, contestant.Name)
 	}
 	contest := NewContestInfo(config.TestConfig.Problems, contestants, startTime)
 	log.Printf("%v\n", contest)
@@ -106,41 +121,19 @@ func GenerateContestInfo() error {
 // TODO: try to decrease memory allocation (maybe use jsonparse)
 // UpdateContestInfo upates info about the current contest and writes it to the specified json file
 func UpdateContestInfo() {
-	for {
-		log.Println("Starting update contest info!")
+	if Contest == nil {
 		data, err := os.ReadFile(config.TestConfig.OutputPath)
 		if err != nil {
-			log.Printf("Failed to update contest info: %v", err)
-			return
+			log.Fatal(err)
 		}
-		contest := &ContestInfo{}
-		err = json.Unmarshal(data, &contest)
+		err = json.Unmarshal(data, &Contest)
 		if err != nil {
-			log.Printf("Failed to update contest info: %v", err)
-			return
+			log.Fatal(err)
 		}
-		for _, run := range runs {
-			prevResult := contest.Contestants[run.Id].Results[run.Problem]
-			contestant := contest.Contestants[run.Id]
-
-			if prevResult.Result.Result != OK && run.Result.Result == OK {
-				contestantResults := contestant.Results
-				contestantResults[run.Problem] = *run
-				contestant.Points += 1
-				contestant.Penalty += run.Time + contestant.AdditinalPenalty[run.Problem]
-				contestant.Results = contestantResults
-			} else if prevResult.Result.Result != OK && run.Result.Result != OK {
-				log.Print(contestant.AdditinalPenalty)
-				contestant.AdditinalPenalty[run.Problem] += 20
-			}
-
-			contestantRuns := contestant.Runs
-
-			contestantRuns = append(contestantRuns, *run)
-			contestant.Runs = contestantRuns
-			contest.Contestants[run.Id] = contestant
-		}
-		data, err = json.Marshal(*contest)
+	}
+	for {
+		log.Println("Starting update contest info!")
+		data, err := json.Marshal(*Contest)
 		if err != nil {
 			log.Printf("Failed to update contest info: %v", err)
 			return
@@ -155,3 +148,5 @@ func UpdateContestInfo() {
 		time.Sleep(time.Millisecond * timeStepForContestUpdateMs)
 	}
 }
+
+var Contest *ContestInfo

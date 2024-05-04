@@ -46,10 +46,12 @@ func test(c *fiber.Ctx) error {
 	return nil
 }
 
+// ResponseProblems represents json response for GET /api/problems
 type ResponseProblems struct {
 	Problems []string `json:"problems"`
 }
 
+// getProblems sends problems for the current contest
 func getProblems(c *fiber.Ctx) error {
 	problems := make([]string, 0, len(config.TestConfig.TestsInfo))
 	for k := range config.TestConfig.TestsInfo {
@@ -59,10 +61,12 @@ func getProblems(c *fiber.Ctx) error {
 	return err
 }
 
+// ResponseMe represents json response for GET /api/me
 type ResponseMe struct {
 	Username string `json:"username"`
 }
 
+// getMe sends name of the current user
 func getMe(c *fiber.Ctx) error {
 	value := strings.Replace(c.GetReqHeaders()["Authorization"][0], "Basic ", "", 1)
 	data, err := base64.StdEncoding.DecodeString(value)
@@ -77,7 +81,7 @@ func getMe(c *fiber.Ctx) error {
 	return nil
 }
 
-// TODO: what do if file now replacing
+// getResults sends results of the current contest
 func getResults(c *fiber.Ctx) error {
 	data, err := os.ReadFile(config.TestConfig.OutputPath)
 	if err != nil {
@@ -94,6 +98,7 @@ func getResults(c *fiber.Ctx) error {
 	return nil
 }
 
+// getRuns sends runs for the specified user
 func getRuns(c *fiber.Ctx) error {
 	data, err := os.ReadFile(config.TestConfig.OutputPath)
 	if err != nil {
@@ -122,6 +127,12 @@ func getLanguages(c *fiber.Ctx) error {
 	return nil
 }
 
+func getContestInfo(c *fiber.Ctx) error {
+	_ = c.JSON(internal.Contest)
+	return nil
+}
+
+// InitApi inits api for the fiber app
 func InitApi(app *fiber.App) {
 	app.Post("/api/test", test)
 	app.Get("/api/problems", getProblems)
@@ -130,4 +141,5 @@ func InitApi(app *fiber.App) {
 	app.Get("/api/languages", getLanguages)
 	app.Get("/api/runs", getRuns)
 	app.Get("/api/monitor", monitor.New())
+	app.Get("/api/contest", getContestInfo)
 }
