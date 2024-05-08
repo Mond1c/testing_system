@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"sync"
 	"time"
+    "strings"
 )
 
 type CodeRunnerContext struct {
@@ -81,6 +82,14 @@ func (ctx *CodeRunnerContext) getExpectedOutput(path string) (string, error) {
 	return original, nil
 }
 
+// getExecutableDirectoryAndFile gets directory and file name from executablePath
+func (ctx *CodeRunnerContext) getExecutableDirectoryAndFile() (string, string) {
+    path := strings.Split(ctx.executablePath, "/")
+    directory := strings.Join(path[:len(path)-1], "/")
+    file := path[len(path)-1]
+    return directory, file
+}
+
 // runTest runs test and return test result with giving CodeRunnerContext.
 // test runs using executable with executablePath file.
 func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (TestResult, error) {
@@ -98,7 +107,9 @@ func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (Te
 	defer inputFile.Close()
 	var cmd *exec.Cmd
 	if ctx.language == "java" {
-		cmd = exec.Command("java", ctx.executablePath)
+        dir, file := ctx.getExecutableDirectoryAndFile()
+		cmd = exec.Command("java", file)
+        cmd.Dir = dir
 	} else {
 		cmd = exec.Command("./" + ctx.executablePath)
 	}

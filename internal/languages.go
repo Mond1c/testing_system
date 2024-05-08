@@ -2,7 +2,6 @@ package internal
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 )
 
@@ -33,7 +32,6 @@ func ParseLangauges(path string) (*Languages, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("DATA LENGTH: %v", len(data))
 	config := newLanguages()
 	err = json.Unmarshal(data, &config)
 	if err != nil {
