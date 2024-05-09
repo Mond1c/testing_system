@@ -36,71 +36,87 @@ func getBasicAuth() map[string]string {
 	return data
 }
 
+func parseConfig[T any](f func(path string) (T, error), path string) T {
+	c, err := f(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return c
+}
+
+func initMiddleware(app *fiber.App) {
+	app.Use(basicauth.New(basicauth.Config{
+		Users: getBasicAuth(),
+	}))
+
+	app.Use(pprof.New())
+
+	app.Use(logger.New(logger.Config{
+		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}\n",
+	}))
+
+	app.Use(limiter.New(limiter.Config{
+		Max:        30,
+		Expiration: time.Second * 10,
+	}))
+}
+
+func initFrontend(app *fiber.App) {
+	app.Static("/", "./frontend/build")
+
+	for _, url := range []string{
+		"/",
+		"/upload",
+		"/results",
+		"/runs",
+	} {
+		app.Get(url, Render)
+	}
+}
+
 func main() {
 	applicationConfig := config.ParseArgs()
 
 	CheckIfFileExists(applicationConfig.ConfigPath)
 	CheckIfFileExists(applicationConfig.LanguagesPath)
 
-	var err error
-	config.TestConfig, err = config.ParseConfig(applicationConfig.ConfigPath)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	config.TestConfig = parseConfig(config.ParseConfig, applicationConfig.ConfigPath)
+	config.LangaugesConfig = parseConfig(config.ParseLangauges, applicationConfig.LanguagesPath)
 
-	config.LangaugesConfig, err = config.ParseLangauges(applicationConfig.LanguagesPath)
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
 	log.Printf("Names: %v", config.LangaugesConfig.GetLanguages())
 
 	engine := html.New("./frontend/build", ".html")
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
-	app.Static("/", "./frontend/build")
-	app.Use(basicauth.New(basicauth.Config{
-		Users: getBasicAuth(),
-	}))
-	app.Use(pprof.New())
-	app.Use(logger.New(logger.Config{
-		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}\n",
-	}))
-	app.Use(limiter.New(limiter.Config{
-		Max:        30,
-		Expiration: 10 * time.Second,
-	}))
+
+	initMiddleware(app)
+
 	api.InitApi(app)
 
-	frontendRoutes := []string{
-		"/",
-		"/upload",
-		"/results",
-		"/runs",
-	}
+	initFrontend(app)
 
-	for _, route := range frontendRoutes {
-		app.Get(route, Render)
-	}
 	if applicationConfig.Generate {
-		err = internal.GenerateContestInfo()
+		err := internal.GenerateContestInfo()
 		if err != nil {
 			return
 		}
 	}
+
 	go internal.UpdateContestInfo()
-	if _, err = os.Stat(config.TestDir); !errors.Is(err, os.ErrNotExist) {
+
+	if _, err := os.Stat(config.TestDir); !errors.Is(err, os.ErrNotExist) {
 		err = os.RemoveAll(config.TestDir)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-	err = os.Mkdir(config.TestDir, 0750)
+
+	err := os.Mkdir(config.TestDir, 0750)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	err = app.Listen(":" + applicationConfig.Port)
 	if err != nil {
 		log.Fatal(err)
