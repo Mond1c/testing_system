@@ -45,13 +45,13 @@ func (ts *Run) RunTests() (TestingResult, error) {
 	sends, _ := time.Parse(time.RFC3339, config.TestConfig.StartTime)
 	duration := int64(time.Since(sends).Minutes())
 	if duration > int64(config.TestConfig.Duration) {
-		return TestingResult{Result: NONE, Number: -1}, nil
+		return TestingResult{Result: EOC, Number: -1}, nil
 	}
 	executableName := getExecutableName(ts.fileName, ts.language)
 	ctx := NewCodeRunnerContext(ts.fileName, executableName, ts.language)
 	path, count, err := config.TestConfig.GetTestPathForProblem(ts.problem)
 	if err != nil {
-		return TestingResult{}, err
+        return TestingResult{Result: NONE, Number: -1}, err
 	}
 	result, _ := ctx.Test(path, count)
 	log.Printf("RESULT: %v", result)

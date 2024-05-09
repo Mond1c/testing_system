@@ -60,7 +60,7 @@ func NewContestantInfo(id, name string) *ContestantInfo {
 type ContestInfo struct {
 	Problems    []ProblemInfo              `json:"problems"`
 	Contestants map[string]*ContestantInfo `json:"contestants"`
-	StartTime   time.Time                  `json:"start_time"`
+	StartTime   time.Time                  `json:"startTime"`
 }
 
 // NewContestInfo creates pointer of type ContestInfo

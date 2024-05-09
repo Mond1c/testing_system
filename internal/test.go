@@ -11,6 +11,7 @@ const (
 	TL
 	ML
 	WA
+	EOC
 )
 
 // GetString returns string representation of the test result
@@ -26,6 +27,8 @@ func (t *TestResult) GetString() string {
 		return "Time limit"
 	case ML:
 		return "Memory limit"
+	case EOC:
+		return "End of the contest"
 	default:
 		return "Unexpected result"
 	}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"flag"
 	"log"
 	"os"
 	"time"
@@ -38,27 +37,19 @@ func getBasicAuth() map[string]string {
 }
 
 func main() {
-	port := flag.String("port", "8080", "port for the server")
-	configPath := flag.String("config", "", "path to the config file")
-	langaugesPath := flag.String("languages", "", "path to the languages settings file")
-	generateOutput := flag.Bool(
-		"generate",
-		false,
-		"set it if you want generate output json file (turn on on first run)",
-	)
-	flag.Parse()
+	applicationConfig := config.ParseArgs()
 
-	CheckIfFileExists(*configPath)
-	CheckIfFileExists(*langaugesPath)
+	CheckIfFileExists(applicationConfig.ConfigPath)
+	CheckIfFileExists(applicationConfig.LanguagesPath)
 
 	var err error
-	config.TestConfig, err = config.ParseConfig(*configPath)
+	config.TestConfig, err = config.ParseConfig(applicationConfig.ConfigPath)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	config.LangaugesConfig, err = config.ParseLangauges(*langaugesPath)
+	config.LangaugesConfig, err = config.ParseLangauges(applicationConfig.LanguagesPath)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -93,7 +84,7 @@ func main() {
 	for _, route := range frontendRoutes {
 		app.Get(route, Render)
 	}
-	if *generateOutput {
+	if applicationConfig.Generate {
 		err = internal.GenerateContestInfo()
 		if err != nil {
 			return
@@ -110,7 +101,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = app.Listen(":" + *port)
+	err = app.Listen(":" + applicationConfig.Port)
 	if err != nil {
 		log.Fatal(err)
 	}
