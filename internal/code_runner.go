@@ -6,9 +6,11 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 	"sync"
 	"time"
-    "strings"
+
+	"test_system/config"
 )
 
 type CodeRunnerContext struct {
@@ -50,9 +52,15 @@ func (ctx *CodeRunnerContext) compileProgram() error {
 	if _, err := os.Stat(ctx.filePath); os.IsNotExist(err) {
 		return err
 	}
-	if fileName, ok := LangaugesConfig.CompileFiles[ctx.language]; ok {
+	if fileName, ok := config.LangaugesConfig.CompileFiles[ctx.language]; ok {
 		_, err := exec.Command("sh", fileName, ctx.filePath, ctx.executablePath).Output()
-		log.Printf("FileName: %v, path: %v, execPath: %v, err: %v", fileName, ctx.filePath, ctx.executablePath, err)
+		log.Printf(
+			"FileName: %v, path: %v, execPath: %v, err: %v",
+			fileName,
+			ctx.filePath,
+			ctx.executablePath,
+			err,
+		)
 		return err
 	}
 	return fmt.Errorf("unsupported language: %s", ctx.language)
@@ -84,10 +92,10 @@ func (ctx *CodeRunnerContext) getExpectedOutput(path string) (string, error) {
 
 // getExecutableDirectoryAndFile gets directory and file name from executablePath
 func (ctx *CodeRunnerContext) getExecutableDirectoryAndFile() (string, string) {
-    path := strings.Split(ctx.executablePath, "/")
-    directory := strings.Join(path[:len(path)-1], "/")
-    file := path[len(path)-1]
-    return directory, file
+	path := strings.Split(ctx.executablePath, "/")
+	directory := strings.Join(path[:len(path)-1], "/")
+	file := path[len(path)-1]
+	return directory, file
 }
 
 // runTest runs test and return test result with giving CodeRunnerContext.
@@ -107,9 +115,9 @@ func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (Te
 	defer inputFile.Close()
 	var cmd *exec.Cmd
 	if ctx.language == "java" {
-        dir, file := ctx.getExecutableDirectoryAndFile()
+		dir, file := ctx.getExecutableDirectoryAndFile()
 		cmd = exec.Command("java", file)
-        cmd.Dir = dir
+		cmd.Dir = dir
 	} else {
 		cmd = exec.Command("./" + ctx.executablePath)
 	}
@@ -150,7 +158,10 @@ func (ctx *CodeRunnerContext) runPartTests(directoryWithTests string, start, end
 }
 
 // Test tests program on given tests and returns result of testing
-func (ctx *CodeRunnerContext) Test(directoryWithTests string, testsCount int) (TestingResult, error) {
+func (ctx *CodeRunnerContext) Test(
+	directoryWithTests string,
+	testsCount int,
+) (TestingResult, error) {
 	start := time.Now()
 	err := ctx.compileProgram()
 	defer ctx.removeExecutable()

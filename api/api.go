@@ -7,12 +7,18 @@ import (
 	"log"
 	"os"
 	"strings"
-	"test_system/config"
-	"test_system/internal"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
+
+	"test_system/config"
+	"test_system/internal"
 )
+
+// TestResultResponse represents the result of the run
+type TestResultResponse struct {
+	Message string `json:"message"`
+}
 
 // test tests uploading file with source code for correct working
 func test(c *fiber.Ctx) error {
@@ -41,7 +47,7 @@ func test(c *fiber.Ctx) error {
 	result, err := ts.RunTests()
 	internal.CheckForErrorAndSendStatusWithLog(c, err, fiber.StatusInternalServerError)
 
-	err = c.JSON(result)
+	err = c.JSON(TestResultResponse{Message: result.GetString()})
 	internal.CheckForErrorAndSendStatusWithLog(c, err, fiber.StatusInternalServerError)
 	return nil
 }
@@ -122,8 +128,8 @@ func getRuns(c *fiber.Ctx) error {
 
 // getLanguages sends json with languages information.
 func getLanguages(c *fiber.Ctx) error {
-	_ = c.JSON(internal.LangaugesConfig.GetLanguages())
-	log.Printf("%v", internal.LangaugesConfig.GetLanguages())
+	_ = c.JSON(config.LangaugesConfig.GetLanguages())
+	log.Printf("%v", config.LangaugesConfig.GetLanguages())
 	return nil
 }
 
@@ -133,15 +139,21 @@ func getContestInfo(c *fiber.Ctx) error {
 	return nil
 }
 
+// StartTimeResponse represents startTime of the contest and duration of the contest
 type StartTimeResponse struct {
-    StartTime int64 `json:"startTime"`
-    Duration  int64 `json:"duration"`
+	StartTime int64 `json:"startTime"`
+	Duration  int64 `json:"duration"`
 }
 
 // getContestStartTime sends json with the contest start time
 func getContestStartTime(c *fiber.Ctx) error {
-    _ = c.JSON(StartTimeResponse{ StartTime: internal.Contest.StartTime.UnixMilli(), Duration: config.TestConfig.Duration })
-    return nil
+	_ = c.JSON(
+		StartTimeResponse{
+			StartTime: internal.Contest.StartTime.UnixMilli(),
+			Duration:  config.TestConfig.Duration,
+		},
+	)
+	return nil
 }
 
 // InitApi inits api for the fiber app
@@ -154,5 +166,5 @@ func InitApi(app *fiber.App) {
 	app.Get("/api/runs", getRuns)
 	app.Get("/api/monitor", monitor.New())
 	app.Get("/api/contest", getContestInfo)
-    app.Get("/api/startTime", getContestStartTime)
+	app.Get("/api/startTime", getContestStartTime)
 }

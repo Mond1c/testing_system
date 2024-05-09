@@ -5,8 +5,9 @@ import (
 	"log"
 	"os"
 	"sync"
-	"test_system/config"
 	"time"
+
+	"test_system/config"
 )
 
 // ProblemInfo represents number of the task
@@ -63,7 +64,11 @@ type ContestInfo struct {
 }
 
 // NewContestInfo creates pointer of type ContestInfo
-func NewContestInfo(problems []ProblemInfo, contestants map[string]*ContestantInfo, startTime time.Time) *ContestInfo {
+func NewContestInfo(
+	problems []ProblemInfo,
+	contestants map[string]*ContestantInfo,
+	startTime time.Time,
+) *ContestInfo {
 	return &ContestInfo{
 		Problems:    problems,
 		Contestants: contestants,

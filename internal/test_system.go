@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"test_system/config"
 	"time"
+
+	"test_system/config"
 )
 
 // Run represents information that need to execute program on the specified tests
@@ -43,9 +44,9 @@ func NewRun(fileName, language, problem, username string) *Run {
 func (ts *Run) RunTests() (TestingResult, error) {
 	sends, _ := time.Parse(time.RFC3339, config.TestConfig.StartTime)
 	duration := int64(time.Since(sends).Minutes())
-    if duration > int64(config.TestConfig.Duration) {
-        return TestingResult{Result: NONE, Number: -1}, nil
-    }
+	if duration > int64(config.TestConfig.Duration) {
+		return TestingResult{Result: NONE, Number: -1}, nil
+	}
 	executableName := getExecutableName(ts.fileName, ts.language)
 	ctx := NewCodeRunnerContext(ts.fileName, executableName, ts.language)
 	path, count, err := config.TestConfig.GetTestPathForProblem(ts.problem)

@@ -5,7 +5,7 @@
 You can run the example using this command:
 
 ```
-go run ./cmd -config examples/input.json
+go run ./cmd -config examples/input.json -languages examples/languages.json
 ```
 
 But you need to specify the path to the test folder for each problem.

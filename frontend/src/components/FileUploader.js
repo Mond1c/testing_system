@@ -1,15 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-const Results = {
-  0: "Undefined behaviour",
-  1: "OK",
-  2: "Compile error",
-  3: "Runtime error",
-  4: "Time limit",
-  5: "Memory limit",
-  6: "Wrong answer"
-};
-
 const FileUploader = () => {
   const [problems, setProblems] = useState([]);
   const [username, setUsername] = useState(undefined);
@@ -53,12 +43,7 @@ const FileUploader = () => {
     })
       .then((response) => response.json())
       .then((response) => {
-        const result = Results[response.result];
-        if (response.number > -1) {
-          setVerdict(result + " on test " + (response.number + 1));
-        } else {
-          setVerdict(result);
-        }
+        setVerdict(response.message);
       });
   };
 

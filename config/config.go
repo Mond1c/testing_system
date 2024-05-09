@@ -22,12 +22,12 @@ type Config struct {
 		Password string `json:"password"`
 	} `json:"credentials"`
 	Problems []string `json:"problems"`
-    Duration int64 `json:"duration"`
+	Duration int64    `json:"duration"`
 }
 
 func newConfig() *Config {
-    config := Config{}
-    config.Duration = 5 * 60 * 60 
+	config := Config{}
+	config.Duration = 5 * 60 * 60
 	return &config
 }
 

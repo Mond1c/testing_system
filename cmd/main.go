@@ -2,14 +2,10 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"log"
 	"os"
-	"test_system/api"
-	"test_system/config"
-	"test_system/internal"
 	"time"
-
-	"flag"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
@@ -17,6 +13,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/template/html/v2"
+
+	"test_system/api"
+	"test_system/config"
+	"test_system/internal"
 )
 
 func Render(c *fiber.Ctx) error {
@@ -41,7 +41,11 @@ func main() {
 	port := flag.String("port", "8080", "port for the server")
 	configPath := flag.String("config", "", "path to the config file")
 	langaugesPath := flag.String("languages", "", "path to the languages settings file")
-	generateOutput := flag.Bool("generate", false, "set it if you want generate output json file (turn on on first run)")
+	generateOutput := flag.Bool(
+		"generate",
+		false,
+		"set it if you want generate output json file (turn on on first run)",
+	)
 	flag.Parse()
 
 	CheckIfFileExists(*configPath)
@@ -54,12 +58,12 @@ func main() {
 		return
 	}
 
-	internal.LangaugesConfig, err = internal.ParseLangauges(*langaugesPath)
+	config.LangaugesConfig, err = config.ParseLangauges(*langaugesPath)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	log.Printf("Names: %v", internal.LangaugesConfig.GetLanguages())
+	log.Printf("Names: %v", config.LangaugesConfig.GetLanguages())
 
 	engine := html.New("./frontend/build", ".html")
 	app := fiber.New(fiber.Config{
