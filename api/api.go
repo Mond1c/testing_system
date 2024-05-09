@@ -133,6 +133,17 @@ func getContestInfo(c *fiber.Ctx) error {
 	return nil
 }
 
+type StartTimeResponse struct {
+    StartTime int64 `json:"startTime"`
+    Duration  int64 `json:"duration"`
+}
+
+// getContestStartTime sends json with the contest start time
+func getContestStartTime(c *fiber.Ctx) error {
+    _ = c.JSON(StartTimeResponse{ StartTime: internal.Contest.StartTime.UnixMilli(), Duration: config.TestConfig.Duration })
+    return nil
+}
+
 // InitApi inits api for the fiber app
 func InitApi(app *fiber.App) {
 	app.Post("/api/test", test)
@@ -143,4 +154,5 @@ func InitApi(app *fiber.App) {
 	app.Get("/api/runs", getRuns)
 	app.Get("/api/monitor", monitor.New())
 	app.Get("/api/contest", getContestInfo)
+    app.Get("/api/startTime", getContestStartTime)
 }
