@@ -20,6 +20,7 @@ type Config struct {
 	Credentials map[string]struct {
 		Id       string `json:"id"`
 		Password string `json:"password"`
+		Role     string `json:"role"`
 	} `json:"credentials"`
 	Problems []string `json:"problems"`
 	Duration int64    `json:"duration"`
@@ -28,6 +29,7 @@ type Config struct {
 func newConfig() *Config {
 	config := Config{}
 	config.Duration = 5 * 60 * 60
+	config.OutputPath = "output.json"
 	return &config
 }
 

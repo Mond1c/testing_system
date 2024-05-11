@@ -117,8 +117,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = app.Listen(":" + applicationConfig.Port)
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Print(app.Listen(":" + applicationConfig.Port))
 }

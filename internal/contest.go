@@ -107,6 +107,7 @@ func GenerateContestInfo() error {
 	for _, contestant := range config.TestConfig.Contestans {
 		contestants[contestant.Id] = NewContestantInfo(contestant.Id, contestant.Name)
 	}
+
 	contest := NewContestInfo(config.TestConfig.Problems, contestants, startTime)
 	log.Printf("%v\n", contest)
 	data, err := json.Marshal(contest)
