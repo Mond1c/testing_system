@@ -10,8 +10,7 @@ const FileUploader = () => {
     fetch("/api/problems")
       .then((response) => response.json())
       .then((response) => {
-        response.problems.sort();
-        setProblems(response.problems);
+        setProblems(response);
       });
   };
 

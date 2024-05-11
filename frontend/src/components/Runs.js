@@ -28,7 +28,6 @@ const TableElementWrapper = styled.td`
 
 const Runs = () => {
     const [runs, setRuns] = useState([]);
-    const [username, setUsername] = useState(undefined);
 
     const getResult = (r) => {
         const result = Results[r.result];
@@ -39,27 +38,19 @@ const Runs = () => {
         }
     }
 
-    const getUsername = () => {
-        return fetch("/api/me")
-            .then((response) => response.json());
-    };
-
-    const getRuns = (name) => {
-        fetch("/api/runs?name=" + name)
+    const getRuns = () => {
+        fetch("/api/runs")
             .then(response => response.json())
             .then(response => setRuns(response));
     };
 
     useEffect(() => {
-        getUsername().then(response => {
-            setUsername(response.username);
-            getRuns(response.username);
-        });
+        getRuns();
     }, []);
 
     return (
         <div>
-            <h1>Hello, {username !== undefined ? username : ""}</h1>
+            <h1>Runs</h1>
             <TableWrapper>
                 <tr>
                     <TableHeaderWrapper>Problem</TableHeaderWrapper>

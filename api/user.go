@@ -54,15 +54,23 @@ func getProblems(c *fiber.Ctx) error {
 	return c.JSON(internal.Contest.Problems)
 }
 
+// getUsername returns username from the header
+func getUsername(header string) (string, error) {
+	value := strings.Replace(header, "Basic ", "", 1)
+	data, err := base64.StdEncoding.DecodeString(value)
+	if err != nil {
+		return "", err
+	}
+	return strings.Split(string(data), ":")[0], nil
+}
+
 // getMe sends name of the current user
 func getMe(c *fiber.Ctx) error {
-	value := strings.Replace(c.GetReqHeaders()["Authorization"][0], "Basic ", "", 1)
-	data, err := base64.StdEncoding.DecodeString(value)
+	username, err := getUsername(c.GetReqHeaders()["Authorization"][0])
 	if err != nil {
 		return err
 	}
-	username := strings.Split(string(data), ":")[0]
-	return c.JSON(ResponseMe{Username: username})
+	return c.JSON(UsernameResponse{Username: username})
 }
 
 // getResults sends results of the current contest
@@ -72,7 +80,11 @@ func getResults(c *fiber.Ctx) error {
 
 // getRuns sends runs for the specified user
 func getRuns(c *fiber.Ctx) error {
-	id, ok := config.TestConfig.Credentials[c.Query("name")]
+	username, err := getUsername(c.GetReqHeaders()["Authorization"][0])
+	if err != nil {
+		return err
+	}
+	id, ok := config.TestConfig.Credentials[username]
 	if !ok {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid username")
 	}

@@ -5,13 +5,8 @@ type TestResultResponse struct {
 	Message string `json:"message"`
 }
 
-// ResponseProblems represents json response for GET /api/problems
-type ResponseProblems struct {
-	Problems []string `json:"problems"`
-}
-
 // ResponseMe represents json response for GET /api/me
-type ResponseMe struct {
+type UsernameResponse struct {
 	Username string `json:"username"`
 }
 
