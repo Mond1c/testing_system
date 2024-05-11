@@ -14,7 +14,7 @@ jobs:
          go-version: '1.21'
          cache: true
      - name: Build
-       run: go build ./cmd
+       run: go build -o test_system.out ./cmd
  lint:
    runs-on: ubuntu-latest
    steps:
