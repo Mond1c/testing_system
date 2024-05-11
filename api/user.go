@@ -5,10 +5,12 @@ import (
 	"io"
 	"os"
 	"strings"
-	"test_system/config"
-	"test_system/internal"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
+
+	"test_system/config"
+	"test_system/internal"
 )
 
 // test tests uploading file with source code for correct working
@@ -88,4 +90,15 @@ func getContestStartTime(c *fiber.Ctx) error {
 		StartTime: internal.Contest.StartTime.UnixMilli(),
 		Duration:  config.TestConfig.Duration,
 	})
+}
+
+func InitUserApi(app *fiber.App) {
+	app.Post("/api/test", test)
+	app.Get("/api/problems", getProblems)
+	app.Get("/api/me", getMe)
+	app.Get("/api/results", getResults)
+	app.Get("/api/languages", getLanguages)
+	app.Get("/api/runs", getRuns)
+	app.Get("/api/monitor", monitor.New())
+	app.Get("/api/startTime", getContestStartTime)
 }

@@ -92,7 +92,7 @@ func main() {
 
 	initMiddleware(app)
 
-	api.InitApi(app)
+    api.InitUserApi(app)
 
 	initFrontend(app)
 
