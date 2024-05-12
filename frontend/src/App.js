@@ -4,6 +4,7 @@ import FileUploader from "./components/FileUploader";
 import Main from "./components/Main";
 import Results from "./components/Results";
 import Runs from "./components/Runs";
+import AllRuns from "./components/AllRuns";
 
 function App() {
   return (
@@ -12,7 +13,8 @@ function App() {
         <Route path="/" element={<Main />} />
         <Route path="/upload" element={<FileUploader />} />
         <Route path="/results" element={<Results />} />
-        <Route path="/runs" element={<Runs/>} />
+        <Route path="/runs" element={<Runs />} />
+        <Route path="/admin/all_runs" element={<AllRuns />} />
       </Routes>
     </BrowserRouter>
   );

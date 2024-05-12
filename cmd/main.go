@@ -69,6 +69,7 @@ func initFrontend(app *fiber.App) {
 		"/upload",
 		"/results",
 		"/runs",
+        "/admin/all_runs",
 	} {
 		app.Get(url, Render)
 	}

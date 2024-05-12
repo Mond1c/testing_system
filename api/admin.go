@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -41,11 +42,33 @@ func getRunInfo(c *fiber.Ctx) error {
 	return c.JSON(runInfo)
 }
 
+func getUsernameById(id string) string {
+	for username, info := range config.TestConfig.Credentials {
+		if info.Id == id {
+			return username
+		}
+	}
+	return ""
+}
+
+func getProgrammingLanguageByExtension(path string) string {
+	return strings.Split(path, ".")[1]
+}
+
 // getAllRuns returns all runs of all users
 func getAllRuns(c *fiber.Ctx) error {
-	runs := make([]internal.RunInfo, 0)
+	runs := make([]RunInfoResponse, 0)
 	for _, contestant := range internal.Contest.Contestants {
-		runs = append(runs, contestant.Runs...)
+		for i, run := range contestant.Runs {
+			runs = append(runs, RunInfoResponse{
+				Username: getUsernameById(contestant.Id),
+				RunID:    i,
+				Problem:  run.Problem,
+				Result:   run.Result.GetString(),
+				Time:     run.Time,
+                Language: getProgrammingLanguageByExtension(run.FileName),
+			})
+		}
 	}
 	return c.JSON(runs)
 }

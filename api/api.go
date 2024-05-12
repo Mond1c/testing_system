@@ -15,3 +15,12 @@ type StartTimeResponse struct {
 	StartTime int64 `json:"startTime"`
 	Duration  int64 `json:"duration"`
 }
+
+type RunInfoResponse struct {
+	Username string `json:"username"`
+	RunID    int    `json:"run_id"`
+	Problem  string `json:"problem"`
+	Result   string `json:"result"`
+	Time     int64  `json:"time"`
+	Language string `json:"language"`
+}
