@@ -93,6 +93,7 @@ func main() {
 	initMiddleware(app)
 
     api.InitUserApi(app)
+    api.InitAdminAPI(app)
 
 	initFrontend(app)
 
@@ -106,16 +107,13 @@ func main() {
 	go internal.UpdateContestInfo()
 
 	if _, err := os.Stat(config.TestDir); !errors.Is(err, os.ErrNotExist) {
-		err = os.RemoveAll(config.TestDir)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-
-	err := os.Mkdir(config.TestDir, 0750)
-	if err != nil {
-		log.Fatal(err)
-	}
+        log.Printf("Directory %s already exists", config.TestDir)	
+    } else {
+	    err := os.Mkdir(config.TestDir, 0750)
+	    if err != nil {
+		    log.Fatal(err)
+	    }
+    }
 
 	log.Print(app.Listen(":" + applicationConfig.Port))
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -19,23 +20,25 @@ func getRunsOfUser(c *fiber.Ctx) error {
 	return c.JSON(internal.Contest.Contestants[id.Id].Runs)
 }
 
-// getRunInfo return the information of the sxpecified run
-func getRunInfo(c *fiber.Ctx) error {
-	username := c.Query("username")
+func getRunInfoStruct(username, runIDStr string) (*internal.RunInfo, error) {
 	id, ok := config.TestConfig.Credentials[username]
 	if !ok {
-		return c.Status(fiber.StatusBadRequest).SendString("User not found")
+		return nil, errors.New("user not found")
 	}
-	runIDStr := c.Query("run_id")
 	runID, err := strconv.Atoi(runIDStr)
 	if err != nil || runID < 0 || runID >= len(internal.Contest.Contestants[id.Id].Runs) {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid run ID")
+		return nil, errors.New("invalid run ID")
 	}
-	if runID >= len(internal.Contest.Contestants[id.Id].Runs) {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid run ID")
+	return &internal.Contest.Contestants[id.Id].Runs[runID], nil
+}
+
+// getRunInfo return the information of the sxpecified run
+func getRunInfo(c *fiber.Ctx) error {
+	runInfo, err := getRunInfoStruct(c.Query("username"), c.Query("run_id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
-	run := internal.Contest.Contestants[id.Id].Runs[runID]
-	return c.JSON(run)
+	return c.JSON(runInfo)
 }
 
 // getAllRuns returns all runs of all users
@@ -47,9 +50,18 @@ func getAllRuns(c *fiber.Ctx) error {
 	return c.JSON(runs)
 }
 
+func getSourceCodeFileOfUser(c *fiber.Ctx) error {
+	runInfo, err := getRunInfoStruct(c.Query("username"), c.Query("run_id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	return c.Download(runInfo.FileName)
+}
+
 // InitAdminAPI initializes the admin API
 func InitAdminAPI(app *fiber.App) {
 	app.Get("/api/admin/runs", getRunsOfUser)
 	app.Get("/api/admin/run", getRunInfo)
 	app.Get("/api/admin/all_runs", getAllRuns)
+	app.Get("/api/admin/source_code", getSourceCodeFileOfUser)
 }

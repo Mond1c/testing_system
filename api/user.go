@@ -29,7 +29,7 @@ func test(c *fiber.Ctx) error {
 		return nil
 	}
 	defer file.Close()
-	out, err := os.Create(config.TestDir + "/" + fileName.Filename)
+    out, err := os.CreateTemp(config.TestDir, "*." + language)
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func test(c *fiber.Ctx) error {
 		return err
 	}
 
-	ts := internal.NewRun(config.TestDir+"/"+fileName.Filename, language, problem, username)
+	ts := internal.NewRun(out.Name(), language, problem, username)
 	result, err := ts.RunTests()
 	if err != nil {
 		return err

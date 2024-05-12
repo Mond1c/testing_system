@@ -13,21 +13,23 @@ import (
 // ProblemInfo represents number of the task
 type ProblemInfo = string
 
-// RunInfo represents information about the running program on the test cases such as the Result and the Time of sending
+// RunInfo represents information about the run such as Id, Problem, Result, Time and FileName
 type RunInfo struct {
-	Id      string        `json:"id"`
-	Problem ProblemInfo   `json:"problem"`
-	Result  TestingResult `json:"result"`
-	Time    int64         `json:"time"`
+	Id       string        `json:"id"`
+	Problem  ProblemInfo   `json:"problem"`
+	Result   TestingResult `json:"result"`
+	Time     int64         `json:"time"`
+	FileName string        `json:"fileName"`
 }
 
 // NewRunInfo creates pointer of type RunInfo with given RunInfo.Result and RunInfo.Time
-func NewRunInfo(id, problem string, result TestingResult, t int64) *RunInfo {
+func NewRunInfo(id, problem string, result TestingResult, t int64, fileName string) *RunInfo {
 	return &RunInfo{
 		Id:      id,
 		Problem: problem,
 		Result:  result,
 		Time:    t,
+        FileName: fileName,
 	}
 }
 
