@@ -20,16 +20,18 @@ type RunInfo struct {
 	Result   TestingResult `json:"result"`
 	Time     int64         `json:"time"`
 	FileName string        `json:"fileName"`
+	Language string        `json:"language"`
 }
 
 // NewRunInfo creates pointer of type RunInfo with given RunInfo.Result and RunInfo.Time
-func NewRunInfo(id, problem string, result TestingResult, t int64, fileName string) *RunInfo {
+func NewRunInfo(id, problem string, result TestingResult, t int64, fileName, language string) *RunInfo {
 	return &RunInfo{
-		Id:      id,
-		Problem: problem,
-		Result:  result,
-		Time:    t,
-        FileName: fileName,
+		Id:       id,
+		Problem:  problem,
+		Result:   result,
+		Time:     t,
+		FileName: fileName,
+		Language: language,
 	}
 }
 

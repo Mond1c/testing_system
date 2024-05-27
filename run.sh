@@ -1,1 +1,1 @@
-go run ./cmd -config examples/input.json -languages examples/languages.json
+go run ./cmd -config examples/input.json -languages examples/languages.json $1

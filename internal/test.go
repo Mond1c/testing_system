@@ -3,6 +3,7 @@ package internal
 // TestResult type of the enum
 type TestResult int
 
+// Enum values 
 const (
 	NONE = TestResult(iota)
 	OK

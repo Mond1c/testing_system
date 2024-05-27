@@ -13,6 +13,7 @@ import (
 	"test_system/config"
 )
 
+// CodeRunnerContext is a struct that contains all necessary information for running tests.
 type CodeRunnerContext struct {
 	filePath       string
 	language       string
@@ -22,6 +23,7 @@ type CodeRunnerContext struct {
 	failed         bool
 }
 
+// NewCodeRunnerContext creates new COdeRunnerContext with giving parameters.
 func NewCodeRunnerContext(filePath, executablePath, language string) *CodeRunnerContext {
 	threads := 4
 	results := make([]chan TestingResult, threads)
@@ -37,11 +39,13 @@ func NewCodeRunnerContext(filePath, executablePath, language string) *CodeRunner
 	}
 }
 
+// TestingResult is a struct that contains information about test result.
 type TestingResult struct {
 	Number int        `json:"number"`
 	Result TestResult `json:"result"`
 }
 
+// GetString return string representation of TestingResult.
 func (t *TestingResult) GetString() string {
 	return fmt.Sprintf("Test with number %d: %s", t.Number, t.Result.GetString())
 }

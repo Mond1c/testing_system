@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -51,12 +52,35 @@ func (ts *Run) RunTests() (TestingResult, error) {
 	ctx := NewCodeRunnerContext(ts.fileName, executableName, ts.language)
 	path, count, err := config.TestConfig.GetTestPathForProblem(ts.problem)
 	if err != nil {
-        return TestingResult{Result: NONE, Number: -1}, err
+		return TestingResult{Result: NONE, Number: -1}, err
 	}
 	result, _ := ctx.Test(path, count)
 	log.Printf("RESULT: %v", result)
 	AddRun(
-		NewRunInfo(config.TestConfig.Credentials[ts.username].Id, ts.problem, result, duration, ts.fileName),
+		NewRunInfo(config.TestConfig.Credentials[ts.username].Id, ts.problem, result, duration, ts.fileName, ts.language),
 	)
 	return result, nil
+}
+
+func getUsernameById(id string) string {
+	for k, v := range config.TestConfig.Credentials {
+		if v.Id == id {
+			return k
+		}
+	}
+	return ""
+}
+
+func RejudgeRun(run *RunInfo) error {
+	for i, r := range Contest.Contestants[run.Id].Runs {
+		if r.FileName == run.FileName { // i don't really like this, but it will work because I generate uniquie file names
+			ts := NewRun(run.FileName, run.Language, run.Problem, getUsernameById(run.Id))
+			result, err := ts.RunTests()
+			if err != nil {
+				return err
+			}
+			Contest.Contestants[run.Id].Runs[i].Result = result
+		}
+	}
+	return errors.New("Can't find run")
 }

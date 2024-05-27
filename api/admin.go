@@ -66,7 +66,7 @@ func getAllRuns(c *fiber.Ctx) error {
 				Problem:  run.Problem,
 				Result:   run.Result.GetString(),
 				Time:     run.Time,
-                Language: getProgrammingLanguageByExtension(run.FileName),
+				Language: getProgrammingLanguageByExtension(run.FileName),
 			})
 		}
 	}
@@ -79,6 +79,15 @@ func getSourceCodeFileOfUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 	return c.Download(runInfo.FileName)
+}
+
+func rejudge(c *fiber.Ctx) error {
+	runInfo, err := getRunInfoStruct(c.Query("username"), c.Query("run_id"))
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	internal.RejudgeRun(runInfo)
+	return nil
 }
 
 // InitAdminAPI initializes the admin API
