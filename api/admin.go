@@ -86,8 +86,8 @@ func rejudge(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
-	internal.RejudgeRun(runInfo)
-	return nil
+	err = internal.RejudgeRun(runInfo)
+	return err
 }
 
 // InitAdminAPI initializes the admin API
@@ -96,4 +96,5 @@ func InitAdminAPI(app *fiber.App) {
 	app.Get("/api/admin/run", getRunInfo)
 	app.Get("/api/admin/all_runs", getAllRuns)
 	app.Get("/api/admin/source_code", getSourceCodeFileOfUser)
+	app.Post("/api/admin/rejudge", rejudge)
 }
