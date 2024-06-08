@@ -115,7 +115,7 @@ func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (Te
 	}
 	inputFile, err := os.Open(path + ".in")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return RE, err
 	}
 	defer inputFile.Close()

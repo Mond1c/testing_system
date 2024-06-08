@@ -43,9 +43,9 @@ func NewRun(fileName, language, problem, username string) *Run {
 
 // RunTests runs tests and return the result of testing
 func (ts *Run) RunTests() (TestingResult, error) {
-	sends, _ := time.Parse(time.RFC3339, config.TestConfig.StartTime)
-	duration := int64(time.Since(sends).Minutes())
-	if duration > int64(config.TestConfig.Duration) {
+	startTime, _ := time.Parse(time.RFC3339, config.TestConfig.StartTime)
+	duration := int64(time.Since(startTime).Seconds())
+	if duration > config.TestConfig.Duration {
 		return TestingResult{Result: EOC, Number: -1}, nil
 	}
 	executableName := getExecutableName(ts.fileName, ts.language)

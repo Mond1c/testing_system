@@ -108,7 +108,7 @@ func GenerateContestInfo() error {
 		return err
 	}
 	contestants := make(map[string]*ContestantInfo)
-	for _, contestant := range config.TestConfig.Contestans {
+	for _, contestant := range config.TestConfig.Contestants {
 		contestants[contestant.Id] = NewContestantInfo(contestant.Id, contestant.Name)
 	}
 
