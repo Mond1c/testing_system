@@ -3,7 +3,7 @@ package internal
 // TestResult type of the enum
 type TestResult int
 
-// Enum values 
+// Enum values
 const (
 	NONE = TestResult(iota)
 	OK
@@ -30,6 +30,8 @@ func (t *TestResult) GetString() string {
 		return "Memory limit"
 	case EOC:
 		return "End of the contest"
+	case WA:
+		return "Wrong answer"
 	default:
 		return "Unexpected result"
 	}
