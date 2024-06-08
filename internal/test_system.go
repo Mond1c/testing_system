@@ -80,6 +80,7 @@ func RejudgeRun(run *RunInfo) error {
 				return err
 			}
 			Contest.Contestants[run.Id].Runs[i].Result = result
+			return nil
 		}
 	}
 	return errors.New("Can't find run")

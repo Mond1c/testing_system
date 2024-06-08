@@ -21,6 +21,7 @@ type CodeRunnerContext struct {
 	results        []chan TestingResult
 	threads        int
 	failed         bool
+	timeLimit	 time.Duration
 }
 
 // NewCodeRunnerContext creates new COdeRunnerContext with giving parameters.
@@ -36,6 +37,7 @@ func NewCodeRunnerContext(filePath, executablePath, language string) *CodeRunner
 		executablePath: executablePath,
 		results:        results,
 		threads:        threads,
+		timeLimit:     2.0,
 	}
 }
 
@@ -105,8 +107,8 @@ func (ctx *CodeRunnerContext) getExecutableDirectoryAndFile() (string, string) {
 // runTest runs test and return test result with giving CodeRunnerContext.
 // test runs using executable with executablePath file.
 func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (TestResult, error) {
-	path := fmt.Sprintf("%s/%d", directoryWithTests, number)
-	original, err := ctx.getExpectedOutput(path + ".out")
+	path := fmt.Sprintf("%s/%d", directoryWithTests, number) // TODO: Think about windows separator
+	original, err := ctx.getExpectedOutput(path + ".out") // TODO: Think about performance with many users
 	if err != nil {
 		log.Fatal(err)
 		return RE, err
@@ -125,14 +127,23 @@ func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (Te
 	} else {
 		cmd = exec.Command("./" + ctx.executablePath)
 	}
-	cmd.Stdin = inputFile
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Print(output)
-		return RE, err
+	type output struct {
+		out []byte
+		err error
 	}
-
-	return compareOutput(original, string(output)), nil
+	ch := make(chan output)
+	go func() {
+		cmd.Stdin = inputFile
+		out, err := cmd.CombinedOutput()
+		ch <- output{out, err}
+	}()
+	select {
+		case <-time.After(ctx.timeLimit * time.Second):
+			cmd.Process.Kill()
+			return TL, nil
+		case x := <-ch:
+			return compareOutput(original, string(x.out)), nil
+	}
 }
 
 // removeExecutable removes file that creates after compilation

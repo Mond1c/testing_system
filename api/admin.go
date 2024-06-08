@@ -21,6 +21,7 @@ func getRunsOfUser(c *fiber.Ctx) error {
 	return c.JSON(internal.Contest.Contestants[id.Id].Runs)
 }
 
+// getRunInfoStruct returns internal.RunInfo for the specified username and id of the run 
 func getRunInfoStruct(username, runIDStr string) (*internal.RunInfo, error) {
 	id, ok := config.TestConfig.Credentials[username]
 	if !ok {
@@ -42,6 +43,7 @@ func getRunInfo(c *fiber.Ctx) error {
 	return c.JSON(runInfo)
 }
 
+// getUsername returns username for the specified contestant id
 func getUsernameById(id string) string {
 	for username, info := range config.TestConfig.Credentials {
 		if info.Id == id {
@@ -51,6 +53,7 @@ func getUsernameById(id string) string {
 	return ""
 }
 
+// getProgrammingLanguageByExtension returns programming language for the specified file
 func getProgrammingLanguageByExtension(path string) string {
 	return strings.Split(path, ".")[1]
 }
@@ -73,6 +76,7 @@ func getAllRuns(c *fiber.Ctx) error {
 	return c.JSON(runs)
 }
 
+// getSourceCodeFileOfUser gets source code of the probmel for the specified user
 func getSourceCodeFileOfUser(c *fiber.Ctx) error {
 	runInfo, err := getRunInfoStruct(c.Query("username"), c.Query("run_id"))
 	if err != nil {
@@ -81,6 +85,7 @@ func getSourceCodeFileOfUser(c *fiber.Ctx) error {
 	return c.Download(runInfo.FileName)
 }
 
+// rejudge reruns tests for the specified run of the specified user
 func rejudge(c *fiber.Ctx) error {
 	runInfo, err := getRunInfoStruct(c.Query("username"), c.Query("run_id"))
 	if err != nil {
