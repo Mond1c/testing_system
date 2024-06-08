@@ -11,9 +11,9 @@ type Config struct {
 		Path       string `json:"path"`
 		TestsCount int    `json:"count"`
 	} `json:"tests"`
-	OutputPath string `json:"outputPath"`
-	StartTime  string `json:"startTime"`
-	Contestans []struct {
+	OutputPath  string `json:"outputPath"`
+	StartTime   string `json:"startTime"`
+	Contestants []struct {
 		Id   string `json:"id"`
 		Name string `json:"name"`
 	} `json:"contestants"`

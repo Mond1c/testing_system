@@ -1,27 +1,27 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
+	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/gofiber/fiber/v2"
 
 	"test_system/config"
 	"test_system/internal"
 )
 
 // getRunsOfUser returns all runs of the specified user
-func getRunsOfUser(c *fiber.Ctx) error {
-	username := c.Query("username")
+func getRunsOfUser(w http.ResponseWriter, r *http.Request) error {
+	username := r.URL.Query().Get("username")
 	id, ok := config.TestConfig.Credentials[username]
 	if !ok {
-		return c.Status(fiber.StatusBadRequest).SendString("User not found")
+		return errors.New("user not found")
 	}
-	return c.JSON(internal.Contest.Contestants[id.Id].Runs)
+	return json.NewEncoder(w).Encode(internal.Contest.Contestants[id.Id].Runs)
 }
 
-// getRunInfoStruct returns internal.RunInfo for the specified username and id of the run 
+// getRunInfoStruct returns internal.RunInfo for the specified username and id of the run
 func getRunInfoStruct(username, runIDStr string) (*internal.RunInfo, error) {
 	id, ok := config.TestConfig.Credentials[username]
 	if !ok {
@@ -35,12 +35,12 @@ func getRunInfoStruct(username, runIDStr string) (*internal.RunInfo, error) {
 }
 
 // getRunInfo return the information of the sxpecified run
-func getRunInfo(c *fiber.Ctx) error {
-	runInfo, err := getRunInfoStruct(c.Query("username"), c.Query("run_id"))
+func getRunInfo(w http.ResponseWriter, r *http.Request) error {
+	runInfo, err := getRunInfoStruct(r.URL.Query().Get("username"), r.URL.Query().Get("run_id"))
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return err
 	}
-	return c.JSON(runInfo)
+	return json.NewEncoder(w).Encode(runInfo)
 }
 
 // getUsername returns username for the specified contestant id
@@ -59,7 +59,7 @@ func getProgrammingLanguageByExtension(path string) string {
 }
 
 // getAllRuns returns all runs of all users
-func getAllRuns(c *fiber.Ctx) error {
+func getAllRuns(w http.ResponseWriter, r *http.Request) error {
 	runs := make([]RunInfoResponse, 0)
 	for _, contestant := range internal.Contest.Contestants {
 		for i, run := range contestant.Runs {
@@ -73,33 +73,33 @@ func getAllRuns(c *fiber.Ctx) error {
 			})
 		}
 	}
-	return c.JSON(runs)
+	return json.NewEncoder(w).Encode(runs)
 }
 
-// getSourceCodeFileOfUser gets source code of the probmel for the specified user
-func getSourceCodeFileOfUser(c *fiber.Ctx) error {
-	runInfo, err := getRunInfoStruct(c.Query("username"), c.Query("run_id"))
+// getSourceCodeFileOfUser gets source code of the problem for the specified user
+func getSourceCodeFileOfUser(w http.ResponseWriter, r *http.Request) error {
+	runInfo, err := getRunInfoStruct(r.URL.Query().Get("username"), r.URL.Query().Get("run_id"))
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return err
 	}
-	return c.Download(runInfo.FileName)
+	http.ServeFile(w, r, runInfo.FileName)
+	return nil
 }
 
 // rejudge reruns tests for the specified run of the specified user
-func rejudge(c *fiber.Ctx) error {
-	runInfo, err := getRunInfoStruct(c.Query("username"), c.Query("run_id"))
+func rejudge(w http.ResponseWriter, r *http.Request) error {
+	runInfo, err := getRunInfoStruct(r.URL.Query().Get("username"), r.URL.Query().Get("run_id"))
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return err
 	}
-	err = internal.RejudgeRun(runInfo)
-	return err
+	return internal.RejudgeRun(runInfo)
 }
 
 // InitAdminAPI initializes the admin API
-func InitAdminAPI(app *fiber.App) {
-	app.Get("/api/admin/runs", getRunsOfUser)
-	app.Get("/api/admin/run", getRunInfo)
-	app.Get("/api/admin/all_runs", getAllRuns)
-	app.Get("/api/admin/source_code", getSourceCodeFileOfUser)
-	app.Post("/api/admin/rejudge", rejudge)
+func InitAdminAPI() {
+	http.Handle("/api/admin/runs", logMiddleware(getRunsOfUser))
+	http.Handle("/api/admin/run", logMiddleware(getRunInfo))
+	http.Handle("/api/admin/all_runs", logMiddleware(getAllRuns))
+	http.Handle("/api/admin/source_code", logMiddleware(getSourceCodeFileOfUser))
+	http.Handle("/api/admin/rejudge", logMiddleware(rejudge))
 }

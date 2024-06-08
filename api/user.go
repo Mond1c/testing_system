@@ -2,39 +2,32 @@ package api
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"io"
+	"net/http"
 	"os"
 	"strings"
-
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/monitor"
 
 	"test_system/config"
 	"test_system/internal"
 )
 
 // test tests uploading file with source code for correct working
-func test(c *fiber.Ctx) error {
-	fileName, err := c.FormFile("file")
+func test(w http.ResponseWriter, r *http.Request) error {
+	file, _, err := r.FormFile("file")
 	if err != nil {
 		return err
 	}
-
-	language := c.FormValue("language")
-	problem := c.FormValue("problem")
-	username := c.FormValue("username")
-
-	file, err := fileName.Open()
-	if err != nil {
-		return nil
-	}
 	defer file.Close()
-    out, err := os.CreateTemp(config.TestDir, "*." + language)
+	language := r.FormValue("language")
+	problem := r.FormValue("problem")
+	username := r.FormValue("username")
+
+	out, err := os.CreateTemp(config.TestDir, "*."+language)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
-
 	_, err = io.Copy(out, file)
 	if err != nil {
 		return err
@@ -45,13 +38,15 @@ func test(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	err = c.JSON(TestResultResponse{Message: result.GetString()})
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(TestResultResponse{Message: result.GetString()})
 	return err
 }
 
 // getProblems sends problems for the current contest
-func getProblems(c *fiber.Ctx) error {
-	return c.JSON(internal.Contest.Problems)
+func getProblems(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+	return json.NewEncoder(w).Encode(internal.Contest.Problems)
 }
 
 // getUsername returns username from the header
@@ -65,52 +60,57 @@ func getUsername(header string) (string, error) {
 }
 
 // getMe sends name of the current user
-func getMe(c *fiber.Ctx) error {
-	username, err := getUsername(c.GetReqHeaders()["Authorization"][0])
+func getMe(w http.ResponseWriter, r *http.Request) error {
+	username, err := getUsername(r.Header.Get("Authorization"))
 	if err != nil {
 		return err
 	}
-	return c.JSON(UsernameResponse{Username: username})
+	w.Header().Set("Content-Type", "application/json")
+	return json.NewEncoder(w).Encode(UsernameResponse{Username: username})
 }
 
 // getResults sends results of the current contest
-func getResults(c *fiber.Ctx) error {
-	return c.JSON(*internal.Contest)
+func getResults(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+	return json.NewEncoder(w).Encode(*internal.Contest)
 }
 
 // getRuns sends runs for the specified user
-func getRuns(c *fiber.Ctx) error {
-	username, err := getUsername(c.GetReqHeaders()["Authorization"][0])
+func getRuns(w http.ResponseWriter, r *http.Request) error {
+	username, err := getUsername(r.Header.Get("Authorization"))
 	if err != nil {
 		return err
 	}
 	id, ok := config.TestConfig.Credentials[username]
 	if !ok {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid username")
+		w.WriteHeader(http.StatusBadRequest)
+		return nil
 	}
-	return c.JSON(internal.Contest.Contestants[id.Id].Runs)
+	w.Header().Set("Content-Type", "application/json")
+	return json.NewEncoder(w).Encode(internal.Contest.Contestants[id.Id].Runs)
 }
 
 // getLanguages sends json with languages information
-func getLanguages(c *fiber.Ctx) error {
-	return c.JSON(config.LangaugesConfig.GetLanguages())
+func getLanguages(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+	return json.NewEncoder(w).Encode(config.LangaugesConfig.GetLanguages())
 }
 
 // getContestStartTime sends json with the contest start time
-func getContestStartTime(c *fiber.Ctx) error {
-	return c.JSON(StartTimeResponse{
+func getContestStartTime(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+	return json.NewEncoder(w).Encode(StartTimeResponse{
 		StartTime: internal.Contest.StartTime.UnixMilli(),
 		Duration:  config.TestConfig.Duration,
 	})
 }
 
-func InitUserApi(app *fiber.App) {
-	app.Post("/api/test", test)
-	app.Get("/api/problems", getProblems)
-	app.Get("/api/me", getMe)
-	app.Get("/api/results", getResults)
-	app.Get("/api/languages", getLanguages)
-	app.Get("/api/runs", getRuns)
-	app.Get("/api/monitor", monitor.New())
-	app.Get("/api/startTime", getContestStartTime)
+func InitUserApi() {
+	http.Handle("/api/test", logMiddleware(test))
+	http.Handle("/api/problems", logMiddleware(getProblems))
+	http.Handle("/api/me", logMiddleware(getMe))
+	http.Handle("/api/runs", logMiddleware(getRuns))
+	http.Handle("/api/languages", logMiddleware(getLanguages))
+	http.Handle("/api/results", logMiddleware(getResults))
+	http.Handle("/api/startTime", logMiddleware(getContestStartTime))
 }
