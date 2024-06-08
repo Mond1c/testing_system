@@ -21,7 +21,7 @@ type CodeRunnerContext struct {
 	results        []chan TestingResult
 	threads        int
 	failed         bool
-	timeLimit	 time.Duration
+	timeLimit      time.Duration
 }
 
 // NewCodeRunnerContext creates new COdeRunnerContext with giving parameters.
@@ -37,7 +37,7 @@ func NewCodeRunnerContext(filePath, executablePath, language string) *CodeRunner
 		executablePath: executablePath,
 		results:        results,
 		threads:        threads,
-		timeLimit:     2.0,
+		timeLimit:      2.0,
 	}
 }
 
@@ -108,7 +108,7 @@ func (ctx *CodeRunnerContext) getExecutableDirectoryAndFile() (string, string) {
 // test runs using executable with executablePath file.
 func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (TestResult, error) {
 	path := fmt.Sprintf("%s/%d", directoryWithTests, number) // TODO: Think about windows separator
-	original, err := ctx.getExpectedOutput(path + ".out") // TODO: Think about performance with many users
+	original, err := ctx.getExpectedOutput(path + ".out")    // TODO: Think about performance with many users
 	if err != nil {
 		log.Fatal(err)
 		return RE, err
@@ -138,11 +138,11 @@ func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (Te
 		ch <- output{out, err}
 	}()
 	select {
-		case <-time.After(ctx.timeLimit * time.Second):
-			cmd.Process.Kill()
-			return TL, nil
-		case x := <-ch:
-			return compareOutput(original, string(x.out)), nil
+	case <-time.After(ctx.timeLimit * time.Second):
+		cmd.Process.Kill()
+		return TL, nil
+	case x := <-ch:
+		return compareOutput(original, string(x.out)), nil
 	}
 }
 
@@ -185,6 +185,9 @@ func (ctx *CodeRunnerContext) Test(
 		return TestingResult{Number: -1, Result: CE}, err
 	}
 	step := testsCount / ctx.threads // maybe make constant
+	if step < 1 {
+		step = 1
+	}
 	var wg sync.WaitGroup
 	for i := 0; i < testsCount; i += step {
 		wg.Add(1)
