@@ -83,66 +83,65 @@ func NewContestInfo(
 const timeStepForContestUpdateMs = 10000
 
 // AddRun adds new run for the current contest
-func AddRun(run *RunInfo) {
-	prevResult := Contest.Contestants[run.Id].Results[run.Problem]
-	Contest.Contestants[run.Id].mu.Lock()
+func AddRun(contest *ContestInfo, run *RunInfo) {
+	prevResult := contest.Contestants[run.Id].Results[run.Problem]
+	contest.Contestants[run.Id].mu.Lock()
 
 	if prevResult.Result.Result != OK && run.Result.Result == OK {
-		Contest.Contestants[run.Id].Results[run.Problem] = *run
-		Contest.Contestants[run.Id].Points += 1
-		Contest.Contestants[run.Id].Penalty += run.Time + Contest.Contestants[run.Id].AdditionalPenalty[run.Problem]
+		contest.Contestants[run.Id].Results[run.Problem] = *run
+		contest.Contestants[run.Id].Points += 1
+		contest.Contestants[run.Id].Penalty += run.Time + contest.Contestants[run.Id].AdditionalPenalty[run.Problem]
 	} else if prevResult.Result.Result != OK && run.Result.Result != OK {
-		log.Print(Contest.Contestants[run.Id].AdditionalPenalty)
-		Contest.Contestants[run.Id].AdditionalPenalty[run.Problem] += 20
+		log.Print(contest.Contestants[run.Id].AdditionalPenalty)
+		contest.Contestants[run.Id].AdditionalPenalty[run.Problem] += 20
 	}
 
-	Contest.Contestants[run.Id].Runs = append(Contest.Contestants[run.Id].Runs, *run)
-	Contest.Contestants[run.Id].mu.Unlock()
+	contest.Contestants[run.Id].Runs = append(contest.Contestants[run.Id].Runs, *run)
+	contest.Contestants[run.Id].mu.Unlock()
 }
 
 // GenerateContestInfo generates default contest info json file with the specified config
-func GenerateContestInfo() error {
-	startTime, err := time.Parse(time.RFC3339, config.TestConfig.StartTime)
+func GenerateContestInfo(config *config.Config) error {
+	startTime, err := time.Parse(time.RFC3339, config.StartTime)
 	if err != nil {
 		log.Printf("Can't generate contest info becase invalid start time: %v", err)
 		return err
 	}
 	contestants := make(map[string]*ContestantInfo)
-	for _, contestant := range config.TestConfig.Contestants {
+	for _, contestant := range config.Contestants {
 		contestants[contestant.Id] = NewContestantInfo(contestant.Id, contestant.Name)
 	}
 
-	contest := NewContestInfo(config.TestConfig.Problems, contestants, startTime)
-	log.Printf("%v\n", contest)
+	contest := NewContestInfo(config.Problems, contestants, startTime)
 	data, err := json.Marshal(contest)
 	if err != nil {
 		log.Printf("Can't encode contest info to json: %v", err)
 		return err
 	}
-	err = os.WriteFile(config.TestConfig.OutputPath, data, 0644)
+	err = os.WriteFile(config.OutputPath, data, 0644)
 	if err != nil {
 		log.Printf("Can't write contest info to file: %v", err)
 	}
 	return err
 }
 
-// UpdateContestInfo upates info about the current contest and writes it to the specified json file
-func UpdateContestInfo() {
-	if Contest == nil {
-		data, err := os.ReadFile(config.TestConfig.OutputPath)
+// UpdateContestInfo updates info about the current contest and writes it to the specified json file
+func UpdateContestInfo(config *config.Config, contest **ContestInfo) {
+	if *contest == nil {
+		data, err := os.ReadFile(config.OutputPath)
 		if err != nil {
 			log.Fatal(err)
 		}
-		err = json.Unmarshal(data, &Contest)
+		err = json.Unmarshal(data, contest)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 	for {
 		log.Println("Starting update contest info!")
-		data, err := json.Marshal(*Contest)
+		data, err := json.Marshal(*contest)
 		if err == nil {
-			err = os.WriteFile(config.TestConfig.OutputPath, data, 0644)
+			err = os.WriteFile(config.OutputPath, data, 0644)
 		}
 		if err != nil {
 			log.Printf("Failed to update contest info: %v", err)

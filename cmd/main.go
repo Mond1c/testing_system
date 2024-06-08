@@ -46,7 +46,7 @@ func main() {
 	}
 
 	if applicationConfig.Generate {
-		err := internal.GenerateContestInfo()
+		err := internal.GenerateContestInfo(config.TestConfig)
 		if err != nil {
 			return
 		}
@@ -64,7 +64,7 @@ func main() {
 
 	api.InitUserApi()
 	api.InitAdminAPI()
-	go internal.UpdateContestInfo()
+	go internal.UpdateContestInfo(config.TestConfig, &internal.Contest)
 	err := http.ListenAndServe(":"+applicationConfig.Port, nil)
 	if err != nil {
 		log.Fatal(err)
