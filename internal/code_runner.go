@@ -139,7 +139,10 @@ func (ctx *CodeRunnerContext) runTest(directoryWithTests string, number int) (Te
 	}()
 	select {
 	case <-time.After(ctx.timeLimit * time.Second):
-		cmd.Process.Kill()
+		err = cmd.Process.Kill()
+		if err != nil {
+			log.Print(err)
+		}
 		return TL, nil
 	case x := <-ch:
 		return compareOutput(original, string(x.out)), nil
