@@ -5,7 +5,7 @@ type TestResultResponse struct {
 	Message string `json:"message"`
 }
 
-// ResponseMe represents json response for GET /api/me
+// UsernameResponse represents json response for GET /api/me
 type UsernameResponse struct {
 	Username string `json:"username"`
 }

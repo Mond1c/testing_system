@@ -37,26 +37,26 @@ func NewRunInfo(id, problem string, result TestingResult, t int64, fileName, lan
 
 // ContestantInfo represents information about the contestant such as Name, Points, Penalty and information about his Runs.
 type ContestantInfo struct {
-	Id               string                  `json:"id"`
-	Name             string                  `json:"name"`
-	Points           int                     `json:"points"`
-	Penalty          int64                   `json:"penalty"`
-	Runs             []RunInfo               `json:"runs"`
-	Results          map[ProblemInfo]RunInfo `json:"results"`
-	AdditinalPenalty map[ProblemInfo]int64   `json:"additionalPenalty"`
-	mu               sync.Mutex
+	Id                string                  `json:"id"`
+	Name              string                  `json:"name"`
+	Points            int                     `json:"points"`
+	Penalty           int64                   `json:"penalty"`
+	Runs              []RunInfo               `json:"runs"`
+	Results           map[ProblemInfo]RunInfo `json:"results"`
+	AdditionalPenalty map[ProblemInfo]int64   `json:"additionalPenalty"`
+	mu                sync.Mutex
 }
 
 // NewContestantInfo creates pointer of type ContestantInfo
 func NewContestantInfo(id, name string) *ContestantInfo {
 	return &ContestantInfo{
-		Id:               id,
-		Name:             name,
-		Points:           0,
-		Penalty:          0,
-		Runs:             make([]RunInfo, 0),
-		Results:          make(map[ProblemInfo]RunInfo),
-		AdditinalPenalty: make(map[ProblemInfo]int64),
+		Id:                id,
+		Name:              name,
+		Points:            0,
+		Penalty:           0,
+		Runs:              make([]RunInfo, 0),
+		Results:           make(map[ProblemInfo]RunInfo),
+		AdditionalPenalty: make(map[ProblemInfo]int64),
 	}
 }
 
@@ -90,10 +90,10 @@ func AddRun(run *RunInfo) {
 	if prevResult.Result.Result != OK && run.Result.Result == OK {
 		Contest.Contestants[run.Id].Results[run.Problem] = *run
 		Contest.Contestants[run.Id].Points += 1
-		Contest.Contestants[run.Id].Penalty += run.Time + Contest.Contestants[run.Id].AdditinalPenalty[run.Problem]
+		Contest.Contestants[run.Id].Penalty += run.Time + Contest.Contestants[run.Id].AdditionalPenalty[run.Problem]
 	} else if prevResult.Result.Result != OK && run.Result.Result != OK {
-		log.Print(Contest.Contestants[run.Id].AdditinalPenalty)
-		Contest.Contestants[run.Id].AdditinalPenalty[run.Problem] += 20
+		log.Print(Contest.Contestants[run.Id].AdditionalPenalty)
+		Contest.Contestants[run.Id].AdditionalPenalty[run.Problem] += 20
 	}
 
 	Contest.Contestants[run.Id].Runs = append(Contest.Contestants[run.Id].Runs, *run)
