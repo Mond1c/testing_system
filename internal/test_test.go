@@ -19,7 +19,7 @@ func TestGetStringMethodForTestResult(t *testing.T) {
 
 	for _, tt := range tests {
 		if tt.expected != tt.input.GetString() {
-			t.Errorf("GetStringMethodForTestResult.GetString() expected %v, got %v", tt.expected, tt.input.GetString())
+			t.Errorf("GetStringMethodForTestResult.String() expected %v, got %v", tt.expected, tt.input.GetString())
 		}
 	}
 }

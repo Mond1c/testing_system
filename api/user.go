@@ -39,7 +39,7 @@ func test(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(TestResultResponse{Message: result.GetString()})
+	err = json.NewEncoder(w).Encode(TestResultResponse{Message: result.String()})
 	return err
 }
 

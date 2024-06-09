@@ -67,7 +67,7 @@ func getAllRuns(w http.ResponseWriter, r *http.Request) error {
 				Username: getUsernameById(contestant.Id),
 				RunID:    i,
 				Problem:  run.Problem,
-				Result:   run.Result.GetString(),
+				Result:   run.Result.String(),
 				Time:     run.Time,
 				Language: getProgrammingLanguageByExtension(run.FileName),
 			})
