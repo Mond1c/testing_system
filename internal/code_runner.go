@@ -47,8 +47,8 @@ type TestingResult struct {
 	Result TestResult `json:"result"`
 }
 
-// GetString return string representation of TestingResult.
-func (t *TestingResult) GetString() string {
+// String return string representation of TestingResult.
+func (t *TestingResult) String() string {
 	return fmt.Sprintf("Test with number %d: %s", t.Number, t.Result.GetString())
 }
 
