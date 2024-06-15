@@ -74,6 +74,8 @@ func (ctx *CodeRunnerContext) compileProgram() error {
 
 // compareOutput compares output with test case output.
 func compareOutput(original, output string) TestResult {
+	original = strings.Trim(original, " \t\n\r")
+	output = strings.Trim(output, " \t\n\r")
 	if original == output {
 		return OK
 	}

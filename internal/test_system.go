@@ -20,6 +20,7 @@ type Run struct {
 
 // getExecutableName returns name for the executable file and the programming language that was used in the file
 func getExecutableName(fileName, language string) string {
+	fileName = strings.Replace(fileName, "./", "", 1)
 	arr := strings.Split(fileName, ".")
 	if len(arr) != 2 {
 		log.Println("file name is invalid")
@@ -58,7 +59,14 @@ func (ts *Run) RunTests() (TestingResult, error) {
 	log.Printf("RESULT: %v", result)
 	AddRun(
 		Contest,
-		NewRunInfo(config.TestConfig.Credentials[ts.username].Id, ts.problem, result, duration, ts.fileName, ts.language),
+		NewRunInfo(
+			config.TestConfig.Credentials[ts.username].Id,
+			ts.problem,
+			result,
+			duration,
+			ts.fileName,
+			ts.language,
+		),
 	)
 	return result, nil
 }
