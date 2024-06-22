@@ -2,16 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import styled from "styled-components";
 
-const Results = {
-    0: "Undefined behaviour",
-    1: "OK",
-    2: "Compile error",
-    3: "Runtime error",
-    4: "Time limit",
-    5: "Memory limit",
-    6: "Wrong answer"
-};
-
 const TableWrapper = styled.table`
   border: 1px solid black;
   width: 100%;

@@ -3,11 +3,13 @@ package api
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"test_system/config"
 	"test_system/internal"
@@ -24,7 +26,7 @@ func test(w http.ResponseWriter, r *http.Request) error {
 	problem := r.FormValue("problem")
 	username := r.FormValue("username")
 
-	out, err := os.CreateTemp(config.TestDir, "*."+language)
+	out, err := os.CreateTemp(config.TestDir, "Solution*."+language)
 	if err != nil {
 		return err
 	}
@@ -32,6 +34,33 @@ func test(w http.ResponseWriter, r *http.Request) error {
 	_, err = io.Copy(out, file)
 	if err != nil {
 		return err
+	}
+
+	if language == "java" {
+		newFile, err := os.ReadFile(out.Name())
+		if err != nil {
+			return err
+		}
+		output := string(newFile)
+		index := strings.Index(output, "class")
+		index += 6
+		if len(output) <= index {
+			return errors.New("invalid index in java file")
+		}
+
+		for !unicode.IsLetter(rune(output[index])) {
+			index++
+		}
+		className := ""
+		for index < len(output) && unicode.IsLetter(rune(output[index])) {
+			className += string(output[index])
+			index++
+		}
+		output = strings.Replace(output, className, strings.Split(strings.Split(out.Name(), ".")[0], "/")[1], 1)
+		_, err = out.WriteAt([]byte(output), 0)
+		if err != nil {
+			return err
+		}
 	}
 
 	ts := internal.NewRun(out.Name(), language, problem, username)
