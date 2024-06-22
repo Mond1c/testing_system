@@ -162,6 +162,7 @@ func (ctx *CodeRunnerContext) removeExecutable() {
 
 // runPartTests runs part of the tests with the specified start and end indexes.
 func (ctx *CodeRunnerContext) runPartTests(directoryWithTests string, start, end, number int) {
+	log.Println(start, end)
 	for i := start; i < end; i++ {
 		if ctx.failed {
 			break
@@ -196,13 +197,17 @@ func (ctx *CodeRunnerContext) Test(
 	var wg sync.WaitGroup
 	for i := 0; i < testsCount; i += step {
 		wg.Add(1)
-		go func() {
+		go func(start int) {
 			defer wg.Done()
-			ctx.runPartTests(directoryWithTests, i, i+step, i/step)
-		}()
+			ctx.runPartTests(directoryWithTests, start, start+step, start/step)
+		}(i)
 	}
 	wg.Wait()
-	for i := 0; i < ctx.threads; i++ {
+	resultsCount := ctx.threads
+	if testsCount < ctx.threads {
+		resultsCount = 1
+	}
+	for i := 0; i < resultsCount; i++ {
 		result := <-ctx.results[i]
 		if result.Result != OK {
 			return result, nil

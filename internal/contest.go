@@ -93,6 +93,7 @@ func AddRun(contest *ContestInfo, run *RunInfo) {
 		contest.Contestants[run.Id].Penalty += run.Time + contest.Contestants[run.Id].AdditionalPenalty[run.Problem]
 	} else if prevResult.Result.Result != OK && run.Result.Result != OK {
 		log.Print(contest.Contestants[run.Id].AdditionalPenalty)
+		// TODO: 20 is Constant?
 		contest.Contestants[run.Id].AdditionalPenalty[run.Problem] += 20
 	}
 
@@ -104,7 +105,7 @@ func AddRun(contest *ContestInfo, run *RunInfo) {
 func GenerateContestInfo(config *config.Config) error {
 	startTime, err := time.Parse(time.RFC3339, config.StartTime)
 	if err != nil {
-		log.Printf("Can't generate contest info becase invalid start time: %v", err)
+		log.Printf("Can't generate contest info becase start time is invalid: %v", err)
 		return err
 	}
 	contestants := make(map[string]*ContestantInfo)

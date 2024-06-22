@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"test_system/config"
@@ -87,7 +88,18 @@ func getRuns(w http.ResponseWriter, r *http.Request) error {
 		return nil
 	}
 	w.Header().Set("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(internal.Contest.Contestants[id.Id].Runs)
+	runs := make([]RunInfoResponse, 0)
+	for i, run := range internal.Contest.Contestants[id.Id].Runs {
+		runs = append(runs, RunInfoResponse{
+			Username: getUsernameById(id.Id),
+			RunID:    i,
+			Problem:  run.Problem,
+			Result:   run.Result.String(),
+			Time:     run.Time,
+			Language: getProgrammingLanguageByExtension(run.FileName),
+		})
+	}
+	return json.NewEncoder(w).Encode(runs)
 }
 
 // getLanguages sends json with languages information
@@ -105,6 +117,27 @@ func getContestStartTime(w http.ResponseWriter, r *http.Request) error {
 	})
 }
 
+func getSourceCode(w http.ResponseWriter, r *http.Request) error {
+	username, err := getUsername(r.Header.Get("Authorization"))
+	if err != nil {
+		return err
+	}
+	id, ok := config.TestConfig.Credentials[username]
+	if !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		return nil
+	}
+	runID := r.FormValue("run_id")
+	runIDNumber, err := strconv.Atoi(runID)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return nil
+	}
+	run := internal.Contest.Contestants[id.Id].Runs[runIDNumber]
+	http.ServeFile(w, r, run.FileName)
+	return nil
+}
+
 func InitUserApi() {
 	http.Handle("/api/test", logMiddleware(test))
 	http.Handle("/api/problems", logMiddleware(getProblems))
@@ -113,4 +146,5 @@ func InitUserApi() {
 	http.Handle("/api/languages", logMiddleware(getLanguages))
 	http.Handle("/api/results", logMiddleware(getResults))
 	http.Handle("/api/startTime", logMiddleware(getContestStartTime))
+	http.Handle("/api/source_code", logMiddleware(getSourceCode))
 }

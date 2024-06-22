@@ -1,44 +1,44 @@
 {
   "tests": {
     "A": {
-      "path": "cmd/tests",
-      "count": 1000
+      "path": "examples/tests",
+      "count": 1
     },
     "B": {
-      "path": "cmd/tests",
-      "count": 1000
+      "path": "examples/tests",
+      "count": 1
     },
     "C": {
-      "path": "cmd/tests",
-      "count": 1000
+      "path": "examples/tests",
+      "count": 1
     },
     "D": {
-      "path": "cmd/tests",
-      "count": 1000
+      "path": "examples/tests",
+      "count": 1
     },
     "E": {
-      "path": "cmd/tests",
-      "count": 1000
+      "path": "examples/tests",
+      "count": 1
     },
     "F": {
-      "path": "cmd/tests",
-      "count": 1000
+      "path": "examples/tests",
+      "count": 1
     },
     "G": {
-      "path": "cmd/tests",
-      "count": 1000
+      "path": "examples/tests",
+      "count": 1
     },
     "H": {
-      "path": "cmd/tests",
-      "count": 1000
+      "path": "examples/tests",
+      "count": 1
     },
     "I": {
-      "path": "cmd/tests",
-      "count": 1000
+      "path": "examples/tests",
+      "count": 1
     }
   },
   "outputPath": "output.json",
-  "startTime": "2024-05-30T18:00:00Z",
+  "startTime": "2024-06-22T12:00:00Z",
   "contestants": [
     {
       "id": "1",
