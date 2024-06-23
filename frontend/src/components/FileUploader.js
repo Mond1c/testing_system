@@ -1,4 +1,33 @@
 import React, { useEffect, useState } from "react";
+import styled from "styled-components";
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 20px;
+`;
+
+const Title = styled.h1`
+  text-align: left;
+`;
+
+const Label = styled.label`
+  display: block;
+  text-align: left;
+`;
+
+const Select = styled.select`
+  text-align: left;
+`;
+
+const Input = styled.input`
+  text-align: left;
+`;
+
+const Button = styled.input`
+  text-align: left;
+`;
 
 const FileUploader = () => {
   const [problems, setProblems] = useState([]);
@@ -16,8 +45,8 @@ const FileUploader = () => {
 
   const getLanguages = () => {
     fetch("/api/languages")
-      .then(response => response.json())
-      .then(response => setLanguages(response));
+      .then((response) => response.json())
+      .then((response) => setLanguages(response));
   };
 
   const getUsername = () => {
@@ -53,31 +82,34 @@ const FileUploader = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Hello, {username !== undefined ? username : ""}</h1>
-      <h2>Upload a solution</h2>
-      <label for="problem">Problem:</label>
-      <select name="problem" id="problem">
-        {problems.map((problem) => {
-          return <option value={problem}>{problem}</option>;
-        })}
-      </select>
+    <Container>
+      <Title>Hello, {username !== undefined ? username : ""}</Title>
+      <h2 style={{ textAlign: "left" }}>Upload a solution</h2>
+      <Label htmlFor="problem">Problem:</Label>
+      <Select name="problem" id="problem">
+        {problems.map((problem) => (
+          <option key={problem} value={problem}>
+            {problem}
+          </option>
+        ))}
+      </Select>
       <br />
-      <label for="file">Filename:</label>
-      <input type="file" name="file" id="file" />
+      <Label htmlFor="file">Filename:</Label>
+      <Input type="file" name="file" id="file" />
       <br />
-      <input type="submit" name="submit" value="Submit" onClick={sendFile} />
+      <Label htmlFor="language">Language:</Label>
+      <Select name="language" id="language">
+        {languages.map((lang) => (
+          <option key={lang.value} value={lang.value}>
+            {lang.name}
+          </option>
+        ))}
+      </Select>
       <br />
-      <label for="language">Language:</label>
-      <select name="language" id="language">
-        {languages.map(lang => {
-          return <option value={lang.value}>{lang.name}</option>;
-        })}
-      </select>
-
+      <Button type="submit" name="submit" value="Submit" onClick={sendFile} />
       <br />
-      <h1>Verdict: {verdict}</h1>
-    </div>
+      <Title>Verdict: {verdict}</Title>
+    </Container>
   );
 };
 

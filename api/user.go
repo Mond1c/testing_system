@@ -146,6 +146,7 @@ func getContestStartTime(w http.ResponseWriter, r *http.Request) error {
 	})
 }
 
+// getSourceCode sends source code of the specified run
 func getSourceCode(w http.ResponseWriter, r *http.Request) error {
 	username, err := getUsername(r.Header.Get("Authorization"))
 	if err != nil {
@@ -167,6 +168,7 @@ func getSourceCode(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// InitUserApi initializes user api
 func InitUserApi() {
 	http.Handle("/api/test", logMiddleware(test))
 	http.Handle("/api/problems", logMiddleware(getProblems))

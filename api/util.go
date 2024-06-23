@@ -10,8 +10,10 @@ import (
 	"time"
 )
 
+// HandlerWithError is a type for http handlers that can return an error
 type HandlerWithError func(w http.ResponseWriter, r *http.Request) error
 
+// basicAuthHandler is a middleware that checks for basic auth
 func basicAuthHandler(h HandlerWithError) HandlerWithError {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		authHeader := r.Header.Get("Authorization")
@@ -48,7 +50,7 @@ func basicAuthHandler(h HandlerWithError) HandlerWithError {
 	}
 }
 
-// Think about codes
+// logMiddleware is a middleware that logs requests and use basicAuthHandler middleware
 func logMiddleware(h HandlerWithError) http.Handler {
 	logFunc := func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()

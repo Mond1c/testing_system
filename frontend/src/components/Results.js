@@ -1,20 +1,34 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
+const Wrapper = styled.div`
+  margin: 20px;
+`;
+
+const Title = styled.h1`
+  font-size: 24px;
+  margin-bottom: 10px;
+`;
+
 const TableWrapper = styled.table`
-  border: 1px solid black;
+  border-collapse: collapse;
+  width: 100%;
 `;
 
 const TableHeaderWrapper = styled.th`
   border: 1px solid black;
+  padding: 8px;
+  background-color: #f2f2f2;
+  font-weight: bold;
 `;
 
 const TableElementWrapper = styled.td`
   border: 1px solid black;
+  padding: 8px;
   text-align: center;
 `;
 
-const Results = () => {  
+const Results = () => {
   const [results, setResults] = useState([]);
   const [problems, setProblems] = useState([]);
 
@@ -31,8 +45,8 @@ const Results = () => {
             return a.penalty - b.penalty;
           }
           return b.points - a.points;
-        })
-        setResults(res)
+        });
+        setResults(res);
       });
   };
 
@@ -61,7 +75,7 @@ const Results = () => {
     console.log(contestants);
     return contestants.map((contestant) => {
       return (
-        <tr>
+        <tr key={contestant.id}>
           <TableElementWrapper>{contestant.id}</TableElementWrapper>
           <TableElementWrapper>{contestant.name}</TableElementWrapper>
           {problems.map((problem) => {
@@ -75,24 +89,28 @@ const Results = () => {
   };
 
   return (
-    <div>
-      <h1>Results</h1>
-      <TableWrapper style={{ width: "100%" }}>
-        <tr>
-          <TableHeaderWrapper>Id</TableHeaderWrapper>
-          <TableHeaderWrapper>Name</TableHeaderWrapper>
-          {problems.map((problem) => {
-            console.log(results);
-            return <TableHeaderWrapper>{problem}</TableHeaderWrapper>;
-          })}
-          <TableHeaderWrapper>Score</TableHeaderWrapper>
-          <TableHeaderWrapper>Penalty</TableHeaderWrapper>
-        </tr>
-        {results !== undefined
-          ? getContestants(results)
-          : ""}
+    <Wrapper>
+      <Title>Results</Title>
+      <TableWrapper>
+        <thead>
+          <tr>
+            <TableHeaderWrapper>Id</TableHeaderWrapper>
+            <TableHeaderWrapper>Name</TableHeaderWrapper>
+            {problems.map((problem) => {
+              console.log(results);
+              return (
+                <TableHeaderWrapper key={problem}>{problem}</TableHeaderWrapper>
+              );
+            })}
+            <TableHeaderWrapper>Score</TableHeaderWrapper>
+            <TableHeaderWrapper>Penalty</TableHeaderWrapper>
+          </tr>
+        </thead>
+        <tbody>
+          {results !== undefined ? getContestants(results) : null}
+        </tbody>
       </TableWrapper>
-    </div>
+    </Wrapper>
   );
 };
 

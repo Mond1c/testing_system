@@ -5,17 +5,28 @@ import { solarizedlight } from "react-syntax-highlighter/dist/esm/styles/prism";
 import styled from "styled-components";
 
 const TableWrapper = styled.table`
-    border: 1px solid black;
-    width: 100%;
+  border: 1px solid black;
+  width: 100%;
 `;
 
 const TableHeaderWrapper = styled.th`
-    border: 1px solid black;
+  border: 1px solid black;
+  padding: 8px;
+  background-color: #f2f2f2;
 `;
 
 const TableElementWrapper = styled.td`
-    border: 1px solic black;
-    text-aligh: center;
+  border: 1px solid black;
+  padding: 8px;
+  text-align: center;
+`;
+
+const ViewButton = styled.button`
+  padding: 8px 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
 `;
 
 const AllRuns = () => {
@@ -26,8 +37,7 @@ const AllRuns = () => {
   const RunInfo = ({ run }) => {
     const viewSourceCode = () => {
       fetch(
-        "/api/admin/source_code?username=" + run.username + "&run_id=" +
-          run.run_id,
+        "/api/admin/source_code?username=" + run.username + "&run_id=" + run.run_id
       )
         .then((response) => response.text())
         .then((data) => {
@@ -43,7 +53,7 @@ const AllRuns = () => {
         <TableElementWrapper>{run.result}</TableElementWrapper>
         <TableElementWrapper>{run.time}</TableElementWrapper>
         <TableElementWrapper>
-          <button onClick={viewSourceCode}>View</button>
+          <ViewButton onClick={viewSourceCode}>View</ViewButton>
         </TableElementWrapper>
       </tr>
     );
@@ -68,7 +78,7 @@ const AllRuns = () => {
 
   const SourceCode = () => {
     return (
-      <SyntaxHighlighter language={language}>
+      <SyntaxHighlighter language={language} style={solarizedlight}>
         {sourceCode}
       </SyntaxHighlighter>
     );
@@ -85,7 +95,7 @@ const AllRuns = () => {
   }, []);
 
   return (
-    <div> 
+    <div>
       <h1>All Runs</h1>
       <RunTable runs={runs} />
       {sourceCode && <SourceCode />}

@@ -2,20 +2,41 @@ import React, { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import styled from "styled-components";
 
-const TableWrapper = styled.table`
-  border: 1px solid black;
-  width: 100%;
+const Wrapper = styled.div`
+    padding: 20px;
 `;
 
-const TableHeaderWrapper = styled.th`
-  border: 1px solid black;
+const Title = styled.h1`
+    font-size: 24px;
+    margin-bottom: 20px;
 `;
 
-const TableElementWrapper = styled.td`
-  border: 1px solid black;
-  text-align: center;
+const Table = styled.table`
+    border-collapse: collapse;
+    width: 100%;
 `;
 
+const TableHeader = styled.th`
+    border: 1px solid black;
+    padding: 10px;
+    background-color: #f2f2f2;
+    font-weight: bold;
+`;
+
+const TableCell = styled.td`
+    border: 1px solid black;
+    padding: 10px;
+    text-align: center;
+`;
+
+const Button = styled.button`
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+`;
 
 const Runs = () => {
     const [runs, setRuns] = useState([]);
@@ -24,56 +45,58 @@ const Runs = () => {
 
     const getRuns = () => {
         fetch("/api/runs")
-            .then(response => response.json())
-            .then(response => setRuns(response));
+          .then((response) => response.json())
+          .then((data) => setRuns(data.reverse()));
     };
 
     useEffect(() => {
         getRuns();
     }, []);
 
+    const viewSourceCode = (run) => {
+        fetch("/api/source_code?run_id=" + run.run_id)
+            .then((response) => response.text())
+            .then((data) => {
+                setSourceCode(data);
+                setLanguage(run.language);
+            });
+    };
+
     const SourceCode = () => {
         return (
-          <SyntaxHighlighter language={language}>
-            {sourceCode}
-          </SyntaxHighlighter>
+            <SyntaxHighlighter language={language}>
+                {sourceCode}
+            </SyntaxHighlighter>
         );
-      };
+    };
 
     return (
-        <div>
-            <h1>Runs</h1>
-            <TableWrapper>
-                <tr>
-                    <TableHeaderWrapper>Problem</TableHeaderWrapper>
-                    <TableHeaderWrapper>Result</TableHeaderWrapper>
-                    <TableHeaderWrapper>Time</TableHeaderWrapper>
-                    <TableHeaderWrapper>Source Code</TableHeaderWrapper>
-                </tr>
-            {
-                runs.reverse().map(run => {
-                    const viewSourceCode = () => {
-                        fetch("/api/source_code?run_id="+run.run_id)
-                            .then(response => response.text())
-                            .then(data => {
-                                setSourceCode(data);
-                                setLanguage(run.language);
-                            });
-                    }
-                    return (<tr>
-                            <TableElementWrapper>{run.problem}</TableElementWrapper>
-                            <TableElementWrapper>{run.result}</TableElementWrapper>
-                            <TableElementWrapper>{run.time}</TableElementWrapper>
-                            <TableElementWrapper>
-                                <button onClick={viewSourceCode}>View</button>
-                            </TableElementWrapper>
+        <Wrapper>
+            <Title>Runs</Title>
+            <Table>
+                <thead>
+                    <tr>
+                        <TableHeader>Problem</TableHeader>
+                        <TableHeader>Result</TableHeader>
+                        <TableHeader>Time</TableHeader>
+                        <TableHeader>Source Code</TableHeader>
+                    </tr>
+                </thead>
+                <tbody>
+                    {runs.map((run) => (
+                        <tr key={run.run_id}>
+                            <TableCell>{run.problem}</TableCell>
+                            <TableCell>{run.result}</TableCell>
+                            <TableCell>{run.time}</TableCell>
+                            <TableCell>
+                                <Button onClick={() => viewSourceCode(run)}>View</Button>
+                            </TableCell>
                         </tr>
-                    )
-                })
-            }
-            </TableWrapper>
-            {sourceCode && <SourceCode/>}
-        </div>
+                    ))}
+                </tbody>
+            </Table>
+            {sourceCode && <SourceCode />}
+        </Wrapper>
     );
 };
 

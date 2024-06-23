@@ -16,6 +16,7 @@ type StartTimeResponse struct {
 	Duration  int64 `json:"duration"`
 }
 
+// RunInfoResponse represents information about the run
 type RunInfoResponse struct {
 	Username string `json:"username"`
 	RunID    int    `json:"run_id"`
