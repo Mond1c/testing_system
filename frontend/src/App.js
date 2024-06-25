@@ -6,6 +6,7 @@ import Results from "./components/Results";
 import Runs from "./components/Runs";
 import AllRuns from "./components/AllRuns";
 import Header from "./components/Header";
+import Problems from "./components/Problems";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/results" element={<Results />} />
           <Route path="/runs" element={<Runs />} />
           <Route path="/admin/all_runs" element={<AllRuns />} />
+          <Route path="/problems" element={<Problems />} />
         </Routes>
       </div>
     </BrowserRouter>
