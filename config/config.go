@@ -6,6 +6,9 @@ import (
 	"os"
 )
 
+// Config represents information about the contest.
+// TestsInfo represents information about count of the test and path to the directory with tests
+// OutputPath represents path to output json file with contest info
 type Config struct {
 	TestsInfo map[string]struct {
 		Path       string `json:"path"`
