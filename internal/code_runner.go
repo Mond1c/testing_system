@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Mond1c/test_system/config"
+	"github.com/Mond1c/testing_system/config"
 )
 
 // CodeRunnerContext is a struct that contains all necessary information for running tests.

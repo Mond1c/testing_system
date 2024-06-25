@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Mond1c/test_system/config"
+	"github.com/Mond1c/testing_system/config"
 )
 
 // ProblemInfo represents number of the task

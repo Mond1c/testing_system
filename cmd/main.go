@@ -2,9 +2,9 @@ package main
 
 import (
 	"errors"
-	"github.com/Mond1c/test_system/api"
-	"github.com/Mond1c/test_system/config"
-	"github.com/Mond1c/test_system/internal"
+	"github.com/Mond1c/testing_system/api"
+	"github.com/Mond1c/testing_system/config"
+	"github.com/Mond1c/testing_system/internal"
 	"log"
 	"net/http"
 	"os"

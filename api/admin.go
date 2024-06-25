@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Mond1c/test_system/config"
-	"github.com/Mond1c/test_system/internal"
+	"github.com/Mond1c/testing_system/config"
+	"github.com/Mond1c/testing_system/internal"
 )
 
 // getRunsOfUser returns all runs of the specified user
