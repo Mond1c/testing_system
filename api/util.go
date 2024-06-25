@@ -4,10 +4,10 @@ package api
 import (
 	"encoding/base64"
 	"errors"
+	"github.com/Mond1c/test_system/config"
 	"log"
 	"net/http"
 	"strings"
-	"test_system/config"
 	"time"
 )
 

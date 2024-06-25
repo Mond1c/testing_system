@@ -12,8 +12,8 @@ import (
 	"strings"
 	"unicode"
 
-	"test_system/config"
-	"test_system/internal"
+	"github.com/Mond1c/test_system/config"
+	"github.com/Mond1c/test_system/internal"
 )
 
 // test tests uploading file with source code for correct working

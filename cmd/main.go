@@ -2,13 +2,13 @@ package main
 
 import (
 	"errors"
+	"github.com/Mond1c/test_system/api"
+	"github.com/Mond1c/test_system/config"
+	"github.com/Mond1c/test_system/internal"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
-	"test_system/api"
-	"test_system/config"
-	"test_system/internal"
 )
 
 func CheckIfFileExists(path string) {

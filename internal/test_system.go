@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"test_system/config"
+	"github.com/Mond1c/test_system/config"
 )
 
 // Run represents information that need to execute program on the specified tests

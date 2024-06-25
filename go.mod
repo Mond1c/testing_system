@@ -1,4 +1,4 @@
-module github.com/Mond1c/webrtc-grabber
+module github.com/Mond1c/test_system
 
 go 1.22.1
 
