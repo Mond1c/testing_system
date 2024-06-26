@@ -1,3 +1,4 @@
+// Package internal contains internal logic of the application.
 package internal
 
 import (
@@ -71,6 +72,7 @@ func (ts *Run) RunTests() (TestingResult, error) {
 	return result, nil
 }
 
+// getUsernameById returns username of the contestnt with the specified id
 func getUsernameById(id string) string {
 	for k, v := range config.TestConfig.Credentials {
 		if v.Id == id {
@@ -80,6 +82,7 @@ func getUsernameById(id string) string {
 	return ""
 }
 
+// RejudgeRun rejudges the specfied RunInfo
 func RejudgeRun(run *RunInfo) error {
 	for i, r := range Contest.Contestants[run.Id].Runs {
 		if r.FileName == run.FileName { // i don't really like this, but it will work because I generate uniquie file names

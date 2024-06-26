@@ -1,3 +1,4 @@
+// Package internal contains internal logic of the application.
 package internal
 
 // TestResult type of the enum
