@@ -45,18 +45,16 @@ func (tq *TestingQueue) PushTask(task Task) {
 // Update updates the queue
 func (tq *TestingQueue) Update() {
 	for {
-		select {
-		case task := <-tq.queue:
-			go func() {
-				// Deadlock?
-				worker := <-tq.workers
-				defer func() { tq.workers <- worker }()
-				err := worker.RunTask(task)
-				if err != nil {
-					log.Print(err)
-				}
-			}()
-		}
+		task := <-tq.queue
+		go func() {
+			// Deadlock?
+			worker := <-tq.workers
+			defer func() { tq.workers <- worker }()
+			err := worker.RunTask(task)
+			if err != nil {
+				log.Print(err)
+			}
+		}()
 	}
 }
 
