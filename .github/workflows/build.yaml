@@ -4,7 +4,7 @@ on:
    branches:
      - main
 jobs:
- gobuild:
+ tests:
    runs-on: ubuntu-latest
    steps:
      - uses: actions/checkout@v4
@@ -13,8 +13,8 @@ jobs:
        with:
          go-version: '1.21'
          cache: true
-     - name: Build
-       run: go build -o test_system.out ./cmd
+     - name: Test
+       run: go test -v ./api ./internal
  lint:
    runs-on: ubuntu-latest
    steps:
