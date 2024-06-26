@@ -10,6 +10,11 @@ import (
 // Config represents information about the contest.
 // TestsInfo represents information about count of the test and path to the directory with tests
 // OutputPath represents path to output json file with contest info
+// StartTime represents start time of the contest
+// Contestans represents basic information about contestans Name and Id
+// Credentials represents id/login/password/role for every contestant (Role = user/admin)
+// Problems represents array of the problem names in the contest. For example: ["A", "B", "C"]
+// Duration is duration of the contest in seconds
 type Config struct {
 	TestsInfo map[string]struct {
 		Path       string `json:"path"`
@@ -30,6 +35,7 @@ type Config struct {
 	Duration int64    `json:"duration"`
 }
 
+// newConfig creates pointer to Config with default Duration (18000 seconds) and default Outputpath ("output.json")
 func newConfig() *Config {
 	config := Config{}
 	config.Duration = 5 * 60 * 60
@@ -37,6 +43,7 @@ func newConfig() *Config {
 	return &config
 }
 
+// ParseConfig parses Config from json file with specified path.
 func ParseConfig(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -50,6 +57,7 @@ func ParseConfig(path string) (*Config, error) {
 	return config, nil
 }
 
+// GetTestPathForProblem returns path to the folder with tests and count of tests for the specified problem
 func (c *Config) GetTestPathForProblem(problem string) (string, int, error) {
 	value, ok := c.TestsInfo[problem]
 	if !ok {
