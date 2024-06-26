@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -63,14 +64,12 @@ func test(w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 	}
-
 	ts := internal.NewRun(out.Name(), language, problem, username)
-	result, err := ts.RunTests()
-	if err != nil {
-		return err
-	}
+	task := internal.CreateRunTask(ts)
+	log.Print(12312)
+	internal.MyTestingQueue.PushTask(task)
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(TestResultResponse{Message: result.String()})
+	err = json.NewEncoder(w).Encode(TestResultResponse{Message: "Waiting..."})
 	return err
 }
 

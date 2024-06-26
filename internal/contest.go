@@ -82,6 +82,7 @@ func NewContestInfo(
 }
 
 const timeStepForContestUpdateMs = 10000
+const penaltyForWrongAnswer = 20
 
 // AddRun adds new run for the current contest
 func AddRun(contest *ContestInfo, run *RunInfo) {
@@ -94,8 +95,7 @@ func AddRun(contest *ContestInfo, run *RunInfo) {
 		contest.Contestants[run.Id].Penalty += run.Time + contest.Contestants[run.Id].AdditionalPenalty[run.Problem]
 	} else if prevResult.Result.Result != OK && run.Result.Result != OK {
 		log.Print(contest.Contestants[run.Id].AdditionalPenalty)
-		// TODO: 20 is Constant?
-		contest.Contestants[run.Id].AdditionalPenalty[run.Problem] += 20
+		contest.Contestants[run.Id].AdditionalPenalty[run.Problem] += penaltyForWrongAnswer
 	}
 
 	contest.Contestants[run.Id].Runs = append(contest.Contestants[run.Id].Runs, *run)

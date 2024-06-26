@@ -65,6 +65,7 @@ func main() {
 	api.InitUserApi()
 	api.InitAdminAPI()
 	go internal.UpdateContestInfo(config.TestConfig, &internal.Contest)
+	go internal.MyTestingQueue.Update()
 	err := http.ListenAndServe(":"+applicationConfig.Port, nil)
 	if err != nil {
 		log.Fatal(err)
