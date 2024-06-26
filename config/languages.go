@@ -1,3 +1,4 @@
+// Package config contains structures and functions for contest and application config
 package config
 
 import (
