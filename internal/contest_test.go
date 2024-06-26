@@ -2,9 +2,9 @@ package internal
 
 import (
 	"encoding/json"
+	"github.com/Mond1c/testing_system/config"
 	"os"
 	"strconv"
-	"test_system/config"
 	"testing"
 	"time"
 )

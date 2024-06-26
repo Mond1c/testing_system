@@ -1,17 +1,17 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
-	"test_system/config"
-	"test_system/internal"
+	"github.com/Mond1c/testing_system/config"
+	"github.com/Mond1c/testing_system/internal"
 )
 
 func generateConfigForTest(t *testing.T, startTime time.Time) {
@@ -123,7 +123,7 @@ int main() {
 */
 
 func TestGetProblems(t *testing.T) {
-    startTime := time.Now().UTC()
+	startTime := time.Now().UTC()
 	generateConfigForTest(t, startTime)
 	req := httptest.NewRequest(http.MethodGet, "/api/problems", nil)
 	rr := httptest.NewRecorder()
@@ -137,7 +137,7 @@ func TestGetProblems(t *testing.T) {
 }
 
 func TestGetResults(t *testing.T) {
-    startTime := time.Now().UTC()
+	startTime := time.Now().UTC()
 	generateConfigForTest(t, startTime)
 	internal.AddRun(
 		internal.Contest,
@@ -211,7 +211,7 @@ func TestGetResults(t *testing.T) {
 }
 
 func TestGetLanguages(t *testing.T) {
-    startTime := time.Now().UTC()
+	startTime := time.Now().UTC()
 	generateConfigForTest(t, startTime)
 	req := httptest.NewRequest(http.MethodGet, "/api/languages", nil)
 	rr := httptest.NewRecorder()
@@ -240,7 +240,7 @@ func TestGetLanguages(t *testing.T) {
 }
 
 func TestGetContestStartTime(t *testing.T) {
-    startTime := time.Now().UTC()
+	startTime := time.Now().UTC()
 	generateConfigForTest(t, startTime)
 	req := httptest.NewRequest(http.MethodGet, "/api/startTime", nil)
 	rr := httptest.NewRecorder()
@@ -252,12 +252,13 @@ func TestGetContestStartTime(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, rr.Code, "Expected status OK")
 
-	expected := `{"startTime":timeHere, "duration": 18000}`
-	expected = strings.Replace(
-		expected,
-		"timeHere",
-        strconv.FormatInt(startTime.UnixMilli(), 10),
-		1,
-	)
-	assert.JSONEq(t, expected, rr.Body.String(), "Response body mismatch")
+	expectedTime, _ := time.Parse(time.RFC3339, startTime.Format(time.RFC3339))
+	expected := StartTimeResponse{
+		StartTime: expectedTime.UnixMilli(),
+		Duration:  18000,
+	}
+	var actual StartTimeResponse
+	err = json.Unmarshal(rr.Body.Bytes(), &actual)
+	assert.NoError(t, err, "Failed to unmarshal response")
+	assert.Equal(t, expected, actual, "Response body mismatch")
 }
