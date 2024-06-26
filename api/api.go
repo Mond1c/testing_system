@@ -1,3 +1,4 @@
+// Package api contains all api handlers for the application.
 package api
 
 // TestResultResponse represents the result of the run
