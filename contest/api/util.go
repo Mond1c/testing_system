@@ -4,7 +4,7 @@ package api
 import (
 	"encoding/base64"
 	"errors"
-	"github.com/Mond1c/testing_system/config"
+	"github.com/Mond1c/testing_system/contest/config"
 	"log"
 	"net/http"
 	"strings"

@@ -14,7 +14,7 @@ jobs:
          go-version: '1.21'
          cache: true
      - name: Test
-       run: go test -v ./api ./internal
+       run: cd contest && go test -v ./api ./internal && cd ../testing && go test -v ./pkg
  lint:
    runs-on: ubuntu-latest
    steps:
@@ -22,7 +22,7 @@ jobs:
      - uses: actions/setup-go@v5
        with:
          go-version: '1.21'
-         cache: true
+         cache: trueclea
      - name: golangci-lint
        uses: golangci/golangci-lint-action@v4
        with:

@@ -1,5 +1,5 @@
-// Package internal contains internal logic of the application.
-package internal
+// Package pkg contains internal logic of the application.
+package pkg
 
 import (
 	"bufio"
@@ -10,8 +10,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/Mond1c/testing_system/config"
 )
 
 // CodeRunnerContext is a struct that contains all necessary information for running tests.
@@ -23,10 +21,11 @@ type CodeRunnerContext struct {
 	threads        int
 	failed         bool
 	timeLimit      time.Duration
+	compileFiles   map[string]string
 }
 
 // NewCodeRunnerContext creates new COdeRunnerContext with giving parameters.
-func NewCodeRunnerContext(filePath, executablePath, language string) *CodeRunnerContext {
+func NewCodeRunnerContext(filePath, executablePath, language string, compileFiles map[string]string) *CodeRunnerContext {
 	threads := 4
 	results := make([]chan TestingResult, threads)
 	for i := 0; i < threads; i++ {
@@ -39,6 +38,7 @@ func NewCodeRunnerContext(filePath, executablePath, language string) *CodeRunner
 		results:        results,
 		threads:        threads,
 		timeLimit:      2.0,
+		compileFiles:   compileFiles,
 	}
 }
 
@@ -59,7 +59,7 @@ func (ctx *CodeRunnerContext) compileProgram() error {
 	if _, err := os.Stat(ctx.filePath); os.IsNotExist(err) {
 		return err
 	}
-	if fileName, ok := config.LangaugesConfig.CompileFiles[ctx.language]; ok {
+	if fileName, ok := ctx.compileFiles[ctx.language]; ok {
 		_, err := exec.Command("sh", fileName, ctx.filePath, ctx.executablePath).Output()
 		log.Printf(
 			"FileName: %v, path: %v, execPath: %v, err: %v",
@@ -158,7 +158,7 @@ func (ctx *CodeRunnerContext) removeExecutable() {
 	if ctx.language == "java" {
 		path += ".class"
 	}
-	RemoveFile(path)
+	removeFile(path)
 }
 
 // runPartTests runs part of the tests with the specified start and end indexes.

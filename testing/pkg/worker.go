@@ -1,5 +1,5 @@
 // Package internal contains internal logic of the application.
-package internal
+package pkg
 
 // Worker is an interface that should be implemented by all workers.
 type Worker interface {

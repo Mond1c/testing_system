@@ -6,15 +6,15 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"unicode"
 
-	"github.com/Mond1c/testing_system/config"
-	"github.com/Mond1c/testing_system/internal"
+	"github.com/Mond1c/testing_system/contest/config"
+	"github.com/Mond1c/testing_system/contest/internal"
+	"github.com/Mond1c/testing_system/testing/pkg"
 )
 
 // test tests uploading file with source code for correct working
@@ -64,10 +64,13 @@ func test(w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 	}
-	ts := internal.NewRun(out.Name(), language, problem, username)
-	task := internal.CreateRunTask(ts)
-	log.Print(12312)
-	internal.MyTestingQueue.PushTask(task)
+	ts := pkg.NewTestingSystem(config.TestConfig.Duration, config.TestConfig.StartTime,
+		config.TestConfig.GetTestPathForProblem, getUsernameById, config.LangaugesConfig.CompileFiles)
+	run := pkg.NewRun(out.Name(), language, problem, username, config.TestConfig.Credentials[username].Id)
+	task := pkg.CreateRunTask(ts, run, func(info *pkg.RunInfo) {
+		internal.AddRun(internal.Contest, info)
+	})
+	pkg.MyTestingQueue.PushTask(task)
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(TestResultResponse{Message: "Waiting..."})
 	return err

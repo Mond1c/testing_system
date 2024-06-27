@@ -1,1 +1,1 @@
-cd frontend && pnpm build && cd ..
+cd contest/frontend && pnpm build && cd ../..

@@ -2,14 +2,15 @@ package internal
 
 import (
 	"encoding/json"
-	"github.com/Mond1c/testing_system/config"
+	"github.com/Mond1c/testing_system/contest/config"
+	"github.com/Mond1c/testing_system/testing/pkg"
 	"os"
 	"strconv"
 	"testing"
 	"time"
 )
 
-func runInfoEquals(lhs, rhs *RunInfo) bool {
+func runInfoEquals(lhs, rhs *pkg.RunInfo) bool {
 	return lhs.Id == rhs.Id && lhs.Problem == rhs.Problem && lhs.Time == rhs.Time && lhs.FileName == rhs.FileName &&
 		lhs.Result.Result == rhs.Result.Result && lhs.Result.Number == rhs.Result.Number && lhs.Language == rhs.Language
 }
@@ -33,7 +34,7 @@ func TestAddRun(t *testing.T) {
 		"2": NewContestantInfo("2", "Test 2"),
 	}
 	contest := NewContestInfo(problems, contestants, time.Now())
-	runInfo := NewRunInfo("1", "A", TestingResult{-1, OK}, 10, "test.cpp", "cpp")
+	runInfo := pkg.NewRunInfo("1", "A", pkg.TestingResult{-1, pkg.OK}, 10, "test.cpp", "cpp")
 	AddRun(contest, runInfo)
 
 	if len(contest.Contestants["1"].Runs) != 1 {
@@ -57,9 +58,9 @@ func TestAddRunWithExtraPenalty(t *testing.T) {
 		"2": NewContestantInfo("2", "Test 2"),
 	}
 	contest := NewContestInfo(problems, contestants, time.Now())
-	badRunInfo := NewRunInfo("1", "A", TestingResult{0, WA}, 10, "test.cpp", "cpp")
+	badRunInfo := pkg.NewRunInfo("1", "A", pkg.TestingResult{0, pkg.WA}, 10, "test.cpp", "cpp")
 	AddRun(contest, badRunInfo)
-	runInfo := NewRunInfo("1", "A", TestingResult{-1, OK}, 20, "test.cpp", "cpp")
+	runInfo := pkg.NewRunInfo("1", "A", pkg.TestingResult{-1, pkg.OK}, 20, "test.cpp", "cpp")
 	AddRun(contest, runInfo)
 
 	if len(contest.Contestants["1"].Runs) != 2 {
@@ -85,7 +86,7 @@ func TestGenerateContestInfo(t *testing.T) {
 		t.Error(err)
 	}
 	file.Close()
-	defer RemoveFile(file.Name())
+	defer removeFile(file.Name())
 
 	testConfig := config.Config{
 		TestsInfo: map[string]struct {
@@ -179,7 +180,7 @@ func TestGenerateContestInfoWithInvalidTime(t *testing.T) {
 		t.Error(err)
 	}
 	file.Close()
-	defer RemoveFile(file.Name())
+	defer removeFile(file.Name())
 
 	testConfig := config.Config{
 		TestsInfo: map[string]struct {

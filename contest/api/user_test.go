@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/Mond1c/testing_system/config"
-	"github.com/Mond1c/testing_system/internal"
+	"github.com/Mond1c/testing_system/contest/config"
+	"github.com/Mond1c/testing_system/contest/internal"
 )
 
 func generateConfigForTest(t *testing.T, startTime time.Time) {

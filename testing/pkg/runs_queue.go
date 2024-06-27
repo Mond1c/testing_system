@@ -1,5 +1,5 @@
 // Package internal contains internal logic of the application.
-package internal
+package pkg
 
 import "log"
 
@@ -9,9 +9,10 @@ import "log"
 type Task = func() error
 
 // CreateRunTask creates Task for running tests
-func CreateRunTask(run *Run) Task {
+func CreateRunTask(testingSystem *TestingSystem, run *Run, action func(*RunInfo)) Task {
 	return func() error {
-		_, err := run.RunTests()
+		runInfo, err := testingSystem.RunTests(run)
+		action(runInfo)
 		return err
 	}
 }

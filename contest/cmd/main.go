@@ -2,9 +2,11 @@ package main
 
 import (
 	"errors"
-	"github.com/Mond1c/testing_system/api"
-	"github.com/Mond1c/testing_system/config"
-	"github.com/Mond1c/testing_system/internal"
+	"github.com/Mond1c/testing_system/contest/api"
+	"github.com/Mond1c/testing_system/contest/config"
+	"github.com/Mond1c/testing_system/contest/internal"
+
+	"github.com/Mond1c/testing_system/testing/pkg"
 	"log"
 	"net/http"
 	"os"
@@ -65,7 +67,7 @@ func main() {
 	api.InitUserApi()
 	api.InitAdminAPI()
 	go internal.UpdateContestInfo(config.TestConfig, &internal.Contest)
-	go internal.MyTestingQueue.Update()
+	go pkg.MyTestingQueue.Update()
 	err := http.ListenAndServe(":"+applicationConfig.Port, nil)
 	if err != nil {
 		log.Fatal(err)
