@@ -64,12 +64,16 @@ func test(w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 	}
-	ts := pkg.NewTestingSystem(config.TestConfig.Duration, config.TestConfig.StartTime,
-		config.TestConfig.GetTestPathForProblem, getUsernameById, config.LangaugesConfig.CompileFiles)
+	testPath, count, err := config.TestConfig.GetTestPathForProblem(problem)
+	if err != nil {
+		return err
+	}
 	run := pkg.NewRun(out.Name(), language, problem, username, config.TestConfig.Credentials[username].Id)
-	task := pkg.CreateRunTask(ts, run, func(info *pkg.RunInfo) {
-		internal.AddRun(internal.Contest, info)
-	})
+	task := pkg.CreateRunTask(config.TestConfig.Duration, config.TestConfig.StartTime,
+		testPath, count, username, config.LangaugesConfig.CompileFiles[language],
+		run, func(info *pkg.RunInfo) {
+			internal.AddRun(internal.Contest, info)
+		})
 	pkg.MyTestingQueue.PushTask(task)
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(TestResultResponse{Message: "Waiting..."})

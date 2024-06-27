@@ -1,0 +1,47 @@
+{
+  "port": "8081",
+  "testDir": "dirWithCode",
+  "tests": {
+    "A": {
+      "path": "examples/tests",
+      "count": 1
+    },
+    "B": {
+      "path": "examples/tests",
+      "count": 1
+    },
+    "C": {
+      "path": "examples/tests",
+      "count": 1
+    },
+    "D": {
+      "path": "examples/tests",
+      "count": 1
+    },
+    "E": {
+      "path": "examples/tests",
+      "count": 1
+    },
+    "F": {
+      "path": "examples/tests",
+      "count": 1
+    },
+    "G": {
+      "path": "examples/tests",
+      "count": 1
+    },
+    "H": {
+      "path": "examples/tests",
+      "count": 1
+    },
+    "I": {
+      "path": "examples/tests",
+      "count": 1
+    }
+  },
+  "compileFiles": {
+    "cpp": "examples/cpp.sh",
+    "java": "examples/java.sh",
+    "go": "examples/go.sh"
+  }
+}
