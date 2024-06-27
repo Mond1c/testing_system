@@ -20,6 +20,9 @@ jobs:
        run: cd contest && go test -v ./api ./internal && cd ../testing && go test -v ./pkg
  lint:
    runs-on: ubuntu-latest
+   strategy:
+     matrix:
+       directory: [contest, remote_worker, testing ]
    steps:
      - uses: actions/checkout@v4
      - uses: actions/setup-go@v5
@@ -30,4 +33,4 @@ jobs:
        uses: golangci/golangci-lint-action@v4
        with:
          version: latest
-         args: ./...
+         working-directory: ${{ matrix.directory }}
