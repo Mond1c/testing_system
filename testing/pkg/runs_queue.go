@@ -16,12 +16,13 @@ import (
 
 // TODO: Think about this
 
-// Task is a function that should be executed in Worker
+// Task is an interface that can be executed by local Worker or remote Worker.
 type Task interface {
 	Local() error
 	Remote(addr string) error
 }
 
+// RunTask is an implementation of Task interface that needed to run tests.
 type RunTask struct {
 	duration           int64
 	startTime          string
@@ -33,7 +34,7 @@ type RunTask struct {
 	action             func(*RunInfo)
 }
 
-// CreateRunTask creates Task for running tests
+// CreateRunTask creates RunTask for running tests
 func CreateRunTask(duration int64, startTime, testPathForProblem string, testCount int, username, compileFile string,
 	run *Run, action func(*RunInfo)) *RunTask {
 	return &RunTask{
@@ -48,6 +49,7 @@ func CreateRunTask(duration int64, startTime, testPathForProblem string, testCou
 	}
 }
 
+// Local runs tests locally
 func (rt *RunTask) Local() error {
 	ts := NewTestingSystem(rt.duration, rt.startTime, rt.testPathForProblem, rt.testCount, rt.username, rt.compileFile)
 	info, err := ts.RunTests(rt.run)
@@ -58,11 +60,13 @@ func (rt *RunTask) Local() error {
 	return nil
 }
 
+// mustOpen opens file or returns error
 func mustOpen(path string) (*os.File, error) {
 	r, err := os.Open(path)
 	return r, err
 }
 
+// Remote sends post request to remote Worker with the specified address and wait for response.
 func (rt *RunTask) Remote(addr string) error {
 	httpClient := &http.Client{}
 	file, err := mustOpen(rt.run.fileName)

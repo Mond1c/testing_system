@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// Config contains configuration for the remote worker
 type Config struct {
 	Port      string `json:"port"`
 	TestDir   string `json:"testDir"`
@@ -16,10 +17,12 @@ type Config struct {
 	CompileFiles map[string]string `json:"compileFiles"`
 }
 
+// newConfig creates new Config
 func newConfig() *Config {
 	return &Config{}
 }
 
+// ParseConfig parses configuration from the specified path
 func ParseConfig(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -35,8 +38,10 @@ func ParseConfig(path string) (*Config, error) {
 
 var MyConfig *Config
 
+// ApplicationConfig represents config for application
 type ApplicationConfig = string
 
+// ParseArgs parses arguments from command line
 func ParseArgs() *ApplicationConfig {
 	c := flag.String("config", "config.json", "path to the config file")
 	flag.Parse()

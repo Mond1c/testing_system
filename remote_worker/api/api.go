@@ -13,6 +13,7 @@ import (
 	"unicode"
 )
 
+// Test is a handler for testing the solution
 func Test(w http.ResponseWriter, r *http.Request) {
 	log.Print(1231231)
 	file, _, err := r.FormFile("file")
@@ -93,6 +94,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// InitAPI initializes API
 func InitAPI() {
 	http.HandleFunc("/test", Test)
 }
