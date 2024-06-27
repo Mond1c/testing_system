@@ -1,1 +1,1 @@
-golangci-lint run -v ./cmd ./api ./internal ./config
+cd testing && sh lint.sh && cd ../contest && sh lint.sh && cd ..

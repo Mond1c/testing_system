@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Mond1c/testing_system/config"
-	"github.com/Mond1c/testing_system/internal"
+	"github.com/Mond1c/testing_system/contest/config"
+	"github.com/Mond1c/testing_system/contest/internal"
+	"github.com/Mond1c/testing_system/testing/pkg"
 )
 
 // getRunsOfUser returns all runs of the specified user
@@ -23,7 +24,7 @@ func getRunsOfUser(w http.ResponseWriter, r *http.Request) error {
 }
 
 // getRunInfoStruct returns internal.RunInfo for the specified username and id of the run
-func getRunInfoStruct(username, runIDStr string) (*internal.RunInfo, error) {
+func getRunInfoStruct(username, runIDStr string) (*pkg.RunInfo, error) {
 	id, ok := config.TestConfig.Credentials[username]
 	if !ok {
 		return nil, errors.New("user not found")
@@ -89,11 +90,13 @@ func getSourceCodeFileOfUser(w http.ResponseWriter, r *http.Request) error {
 
 // rejudge reruns tests for the specified run of the specified user
 func rejudge(w http.ResponseWriter, r *http.Request) error {
-	runInfo, err := getRunInfoStruct(r.URL.Query().Get("username"), r.URL.Query().Get("run_id"))
+	_, err := getRunInfoStruct(r.URL.Query().Get("username"), r.URL.Query().Get("run_id"))
 	if err != nil {
 		return err
 	}
-	return internal.RejudgeRun(runInfo)
+	// return pkg.RejudgeRun(runInfo)
+	panic("implement me")
+	return nil
 }
 
 // InitAdminAPI initializes the admin API

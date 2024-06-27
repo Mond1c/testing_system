@@ -7,7 +7,7 @@ import (
 )
 
 // RemoveFile removes the file with the specified path
-func RemoveFile(path string) {
+func removeFile(path string) {
 	err := os.Remove(path)
 	if err != nil {
 		log.Print(err)

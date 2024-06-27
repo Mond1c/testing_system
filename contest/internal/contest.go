@@ -3,48 +3,26 @@ package internal
 
 import (
 	"encoding/json"
+	"github.com/Mond1c/testing_system/contest/config"
+	"github.com/Mond1c/testing_system/testing/pkg"
 	"log"
 	"os"
 	"sync"
 	"time"
-
-	"github.com/Mond1c/testing_system/config"
 )
 
 // ProblemInfo represents number of the task
 type ProblemInfo = string
 
-// RunInfo represents information about the run such as Id, Problem, Result, Time and FileName
-type RunInfo struct {
-	Id       string        `json:"id"`
-	Problem  ProblemInfo   `json:"problem"`
-	Result   TestingResult `json:"result"`
-	Time     int64         `json:"time"`
-	FileName string        `json:"fileName"`
-	Language string        `json:"language"`
-}
-
-// NewRunInfo creates pointer of type RunInfo with given RunInfo.Result and RunInfo.Time
-func NewRunInfo(id, problem string, result TestingResult, t int64, fileName, language string) *RunInfo {
-	return &RunInfo{
-		Id:       id,
-		Problem:  problem,
-		Result:   result,
-		Time:     t,
-		FileName: fileName,
-		Language: language,
-	}
-}
-
 // ContestantInfo represents information about the contestant such as Name, Points, Penalty and information about his Runs.
 type ContestantInfo struct {
-	Id                string                  `json:"id"`
-	Name              string                  `json:"name"`
-	Points            int                     `json:"points"`
-	Penalty           int64                   `json:"penalty"`
-	Runs              []RunInfo               `json:"runs"`
-	Results           map[ProblemInfo]RunInfo `json:"results"`
-	AdditionalPenalty map[ProblemInfo]int64   `json:"additionalPenalty"`
+	Id                string                      `json:"id"`
+	Name              string                      `json:"name"`
+	Points            int                         `json:"points"`
+	Penalty           int64                       `json:"penalty"`
+	Runs              []pkg.RunInfo               `json:"runs"`
+	Results           map[ProblemInfo]pkg.RunInfo `json:"results"`
+	AdditionalPenalty map[ProblemInfo]int64       `json:"additionalPenalty"`
 	mu                sync.Mutex
 }
 
@@ -55,8 +33,8 @@ func NewContestantInfo(id, name string) *ContestantInfo {
 		Name:              name,
 		Points:            0,
 		Penalty:           0,
-		Runs:              make([]RunInfo, 0),
-		Results:           make(map[ProblemInfo]RunInfo),
+		Runs:              make([]pkg.RunInfo, 0),
+		Results:           make(map[ProblemInfo]pkg.RunInfo),
 		AdditionalPenalty: make(map[ProblemInfo]int64),
 	}
 }
@@ -85,15 +63,15 @@ const timeStepForContestUpdateMs = 10000
 const penaltyForWrongAnswer = 20
 
 // AddRun adds new run for the current contest
-func AddRun(contest *ContestInfo, run *RunInfo) {
+func AddRun(contest *ContestInfo, run *pkg.RunInfo) {
 	prevResult := contest.Contestants[run.Id].Results[run.Problem]
 	contest.Contestants[run.Id].mu.Lock()
 
-	if prevResult.Result.Result != OK && run.Result.Result == OK {
+	if prevResult.Result.Result != pkg.OK && run.Result.Result == pkg.OK {
 		contest.Contestants[run.Id].Results[run.Problem] = *run
 		contest.Contestants[run.Id].Points += 1
 		contest.Contestants[run.Id].Penalty += run.Time + contest.Contestants[run.Id].AdditionalPenalty[run.Problem]
-	} else if prevResult.Result.Result != OK && run.Result.Result != OK {
+	} else if prevResult.Result.Result != pkg.OK && run.Result.Result != pkg.OK {
 		log.Print(contest.Contestants[run.Id].AdditionalPenalty)
 		contest.Contestants[run.Id].AdditionalPenalty[run.Problem] += penaltyForWrongAnswer
 	}
