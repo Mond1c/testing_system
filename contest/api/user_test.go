@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/Mond1c/testing_system/testing/pkg"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -141,10 +142,10 @@ func TestGetResults(t *testing.T) {
 	generateConfigForTest(t, startTime)
 	internal.AddRun(
 		internal.Contest,
-		internal.NewRunInfo(
+		pkg.NewRunInfo(
 			"1",
 			"A",
-			internal.TestingResult{Result: internal.OK, Number: -1},
+			pkg.TestingResult{Result: pkg.OK, Number: -1},
 			0,
 			"test.cpp",
 			"cpp",
