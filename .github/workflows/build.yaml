@@ -18,16 +18,6 @@ jobs:
          cache: true
      - name: Test
        run: cd contest && go test -v ./api ./internal && cd ../testing && go test -v ./pkg
- resolve-modules:
-   name: Resolve Modules
-   runs-on: ubuntu-latest
-   outputs:
-     matrix: ${{ steps.set-matrix.outputs.matrix }}
-   steps:
-     - name: Checkout Sources
-       uses: actions/checkout@v2
-     - id: set-matrix
-       run: ./ci-tools/resolve-modules.sh
  lint:
    runs-on: ubuntu-latest
    steps:
@@ -40,4 +30,4 @@ jobs:
        uses: golangci/golangci-lint-action@v4
        with:
          version: v1.57.2
-         working-directory: ${{ matrix.workdir }}
+         args: ./contest ./testing
