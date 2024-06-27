@@ -54,7 +54,7 @@ func test(w http.ResponseWriter, r *http.Request) error {
 			index++
 		}
 		className := ""
-		for index < len(output) && unicode.IsLetter(rune(output[index])) {
+		for index < len(output) && (unicode.IsLetter(rune(output[index])) || unicode.IsDigit(rune(output[index]))) {
 			className += string(output[index])
 			index++
 		}
