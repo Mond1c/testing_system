@@ -29,5 +29,5 @@ jobs:
      - name: Linter
        uses: golangci/golangci-lint-action@v4
        with:
-         version: v1.57.2
-         args: ./contest ./testing
+         version: latest
+         args: ./...
