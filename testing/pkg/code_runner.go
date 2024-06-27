@@ -21,11 +21,11 @@ type CodeRunnerContext struct {
 	threads        int
 	failed         bool
 	timeLimit      time.Duration
-	compileFiles   map[string]string
+	compileFile    string
 }
 
 // NewCodeRunnerContext creates new COdeRunnerContext with giving parameters.
-func NewCodeRunnerContext(filePath, executablePath, language string, compileFiles map[string]string) *CodeRunnerContext {
+func NewCodeRunnerContext(filePath, executablePath, language string, compileFile string) *CodeRunnerContext {
 	threads := 4
 	results := make([]chan TestingResult, threads)
 	for i := 0; i < threads; i++ {
@@ -38,7 +38,7 @@ func NewCodeRunnerContext(filePath, executablePath, language string, compileFile
 		results:        results,
 		threads:        threads,
 		timeLimit:      2.0,
-		compileFiles:   compileFiles,
+		compileFile:    compileFile,
 	}
 }
 
@@ -59,18 +59,15 @@ func (ctx *CodeRunnerContext) compileProgram() error {
 	if _, err := os.Stat(ctx.filePath); os.IsNotExist(err) {
 		return err
 	}
-	if fileName, ok := ctx.compileFiles[ctx.language]; ok {
-		_, err := exec.Command("sh", fileName, ctx.filePath, ctx.executablePath).Output()
-		log.Printf(
-			"FileName: %v, path: %v, execPath: %v, err: %v",
-			fileName,
-			ctx.filePath,
-			ctx.executablePath,
-			err,
-		)
-		return err
-	}
-	return fmt.Errorf("unsupported language: %s", ctx.language)
+	_, err := exec.Command("sh", ctx.compileFile, ctx.filePath, ctx.executablePath).Output()
+	log.Printf(
+		"FileName: %v, path: %v, execPath: %v, err: %v",
+		ctx.compileFile,
+		ctx.filePath,
+		ctx.executablePath,
+		err,
+	)
+	return err
 }
 
 // compareOutput compares output with test case output.

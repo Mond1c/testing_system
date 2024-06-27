@@ -9,24 +9,27 @@ import (
 )
 
 type TestingSystem struct {
-	duration              int64
-	startTime             string
-	getTestPathForProblem func(string) (string, int, error)
-	getUsernameById       func(string) string
-	compileFiles          map[string]string
+	duration           int64
+	startTime          string
+	testPathForProblem string
+	testCount          int
+	username           string
+	compileFile        string
 }
 
 func NewTestingSystem(duration int64,
 	startTime string,
-	getTestPathForProblem func(string) (string, int, error),
-	getUsernameById func(string) string,
-	compileFiles map[string]string) *TestingSystem {
+	testPathForProblem string,
+	testCount int,
+	username string,
+	compileFile string) *TestingSystem {
 	return &TestingSystem{
-		duration:              duration,
-		startTime:             startTime,
-		getTestPathForProblem: getTestPathForProblem,
-		getUsernameById:       getUsernameById,
-		compileFiles:          compileFiles,
+		duration:           duration,
+		startTime:          startTime,
+		testPathForProblem: testPathForProblem,
+		testCount:          testCount,
+		username:           username,
+		compileFile:        compileFile,
 	}
 }
 
@@ -74,14 +77,8 @@ func (ts *TestingSystem) RunTests(run *Run) (*RunInfo, error) {
 		result = TestingResult{Result: EOC, Number: -1}
 	} else {
 		executableName := getExecutableName(run.fileName, run.language)
-		ctx := NewCodeRunnerContext(run.fileName, executableName, run.language, ts.compileFiles)
-		path, count, err := ts.getTestPathForProblem(run.problem)
-		if err != nil {
-			result = TestingResult{Result: NONE, Number: -1}
-			returnedErr = err
-		} else {
-			result, _ = ctx.Test(path, count)
-		}
+		ctx := NewCodeRunnerContext(run.fileName, executableName, run.language, ts.compileFile)
+		result, _ = ctx.Test(ts.testPathForProblem, ts.testCount)
 	}
 	log.Printf("RESULT: %v", result)
 	return NewRunInfo(
@@ -96,7 +93,7 @@ func (ts *TestingSystem) RunTests(run *Run) (*RunInfo, error) {
 
 // RejudgeRun rejudges the specified RunInfo
 func (ts *TestingSystem) RejudgeRun(run *RunInfo) error {
-	newRunInfo, err := ts.RunTests(NewRun(run.FileName, run.Language, run.Problem, ts.getUsernameById(run.Id), run.Id))
+	newRunInfo, err := ts.RunTests(NewRun(run.FileName, run.Language, run.Problem, ts.username, run.Id))
 	if err != nil {
 		return err
 	}

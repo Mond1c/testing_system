@@ -17,7 +17,19 @@ func NewLocalWorker() *LocalWorker {
 
 // RunTask runs task locally.
 func (lw *LocalWorker) RunTask(task Task) error {
-	return task()
+	return task.Local()
 }
 
 // TODO: Add remote worker and create package with remote worker
+
+type RemoteWorker struct {
+	address string
+}
+
+func NewRemoteWorker(address string) *RemoteWorker {
+	return &RemoteWorker{address: address}
+}
+
+func (rw *RemoteWorker) RunTask(task Task) error {
+	return task.Remote(rw.address)
+}
