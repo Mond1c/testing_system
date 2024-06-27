@@ -34,7 +34,7 @@ func TestAddRun(t *testing.T) {
 		"2": NewContestantInfo("2", "Test 2"),
 	}
 	contest := NewContestInfo(problems, contestants, time.Now())
-	runInfo := pkg.NewRunInfo("1", "A", pkg.TestingResult{-1, pkg.OK}, 10, "test.cpp", "cpp")
+	runInfo := pkg.NewRunInfo("1", "A", pkg.TestingResult{Number: -1, Result: pkg.OK}, 10, "test.cpp", "cpp")
 	AddRun(contest, runInfo)
 
 	if len(contest.Contestants["1"].Runs) != 1 {
@@ -58,9 +58,9 @@ func TestAddRunWithExtraPenalty(t *testing.T) {
 		"2": NewContestantInfo("2", "Test 2"),
 	}
 	contest := NewContestInfo(problems, contestants, time.Now())
-	badRunInfo := pkg.NewRunInfo("1", "A", pkg.TestingResult{0, pkg.WA}, 10, "test.cpp", "cpp")
+	badRunInfo := pkg.NewRunInfo("1", "A", pkg.TestingResult{Number: 0, Result: pkg.WA}, 10, "test.cpp", "cpp")
 	AddRun(contest, badRunInfo)
-	runInfo := pkg.NewRunInfo("1", "A", pkg.TestingResult{-1, pkg.OK}, 20, "test.cpp", "cpp")
+	runInfo := pkg.NewRunInfo("1", "A", pkg.TestingResult{Number: -1, Result: pkg.OK}, 20, "test.cpp", "cpp")
 	AddRun(contest, runInfo)
 
 	if len(contest.Contestants["1"].Runs) != 2 {

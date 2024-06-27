@@ -96,7 +96,6 @@ func rejudge(w http.ResponseWriter, r *http.Request) error {
 	}
 	// return pkg.RejudgeRun(runInfo)
 	panic("implement me")
-	return nil
 }
 
 // InitAdminAPI initializes the admin API
