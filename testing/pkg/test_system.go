@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// TestingSystem represents the system that runs tests.
 type TestingSystem struct {
 	duration           int64
 	startTime          string
@@ -17,6 +18,7 @@ type TestingSystem struct {
 	compileFile        string
 }
 
+// NewTestingSystem creates new TestingSystem with giving parameters.
 func NewTestingSystem(duration int64,
 	startTime string,
 	testPathForProblem string,
