@@ -1,1 +1,1 @@
-cd contest && go run ./cmd -config examples/input.json -languages examples/languages.json $1
+cd contest && go run ./cmd -config examples/input.json -languages examples/languages.json -workers examples/workers.json $1

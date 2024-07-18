@@ -12,6 +12,7 @@ type ApplicationConfig struct {
 	Port          string
 	ConfigPath    string
 	LanguagesPath string
+	WorkersPath   string
 	Generate      bool
 }
 
@@ -21,6 +22,7 @@ func ParseArgs() *ApplicationConfig {
 	port := flag.String("port", "8080", "port for the application")
 	configPath := flag.String("config", "", "path of the contest config")
 	languagesPath := flag.String("languages", "", "path of the languages config")
+	workersPath := flag.String("workers", "", "path of the workers config")
 	generate := flag.Bool(
 		"generate",
 		false,
@@ -31,6 +33,7 @@ func ParseArgs() *ApplicationConfig {
 		Port:          *port,
 		ConfigPath:    *configPath,
 		LanguagesPath: *languagesPath,
+		WorkersPath:   *workersPath,
 		Generate:      *generate,
 	}
 }

@@ -1,0 +1,10 @@
+{
+  "workers": [
+    {
+      "type": "local"
+    },
+    {
+      "type": "local"
+    }
+  ]
+}

@@ -74,7 +74,7 @@ func test(w http.ResponseWriter, r *http.Request) error {
 		run, func(info *pkg.RunInfo) {
 			internal.AddRun(internal.Contest, info)
 		})
-	pkg.MyTestingQueue.PushTask(task)
+	internal.TestingQueue.PushTask(task)
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(TestResultResponse{Message: "Waiting..."})
 	return err

@@ -8,13 +8,13 @@ import (
 )
 
 // Config represents information about the contest.
-// TestsInfo represents information about count of the test and path to the directory with tests
-// OutputPath represents path to output json file with contest info
-// StartTime represents start time of the contest
-// Contestans represents basic information about contestans Name and Id
-// Credentials represents id/login/password/role for every contestant (Role = user/admin)
-// Problems represents array of the problem names in the contest. For example: ["A", "B", "C"]
-// Duration is duration of the contest in seconds
+// TestsInfo represents information about count of the test and path to the directory with tests.
+// OutputPath represents path to output json file with contest info.
+// StartTime represents start time of the contest.
+// Contestans represents basic information about contestans Name and Id.
+// Credentials represents id/login/password/role for every contestant (Role = user/admin).
+// Problems represents array of the problem names in the contest. For example: ["A", "B", "C"].
+// Duration is duration of the contest in seconds.
 type Config struct {
 	TestsInfo map[string]struct {
 		Path       string `json:"path"`

@@ -35,6 +35,7 @@ func main() {
 
 	config.TestConfig = parseConfig(config.ParseConfig, applicationConfig.ConfigPath)
 	config.LangaugesConfig = parseConfig(config.ParseLangauges, applicationConfig.LanguagesPath)
+	internal.TestingQueue = pkg.NewTestingQueueFromFile(applicationConfig.WorkersPath)
 
 	log.Printf("Names: %v", config.LangaugesConfig.GetLanguages())
 
@@ -67,7 +68,7 @@ func main() {
 	api.InitUserApi()
 	api.InitAdminAPI()
 	go internal.UpdateContestInfo(config.TestConfig, &internal.Contest)
-	go pkg.MyTestingQueue.Update()
+	go internal.TestingQueue.Update()
 	err := http.ListenAndServe(":"+applicationConfig.Port, nil)
 	if err != nil {
 		log.Fatal(err)

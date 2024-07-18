@@ -132,3 +132,4 @@ func UpdateContestInfo(config *config.Config, contest **ContestInfo) {
 }
 
 var Contest *ContestInfo
+var TestingQueue *pkg.TestingQueue

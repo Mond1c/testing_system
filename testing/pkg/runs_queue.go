@@ -179,4 +179,31 @@ func CreateSimpleTestingQueue() *TestingQueue {
 	return NewTestingQueue(workers)
 }
 
-var MyTestingQueue = CreateSimpleTestingQueue()
+func NewTestingQueueFromConfig(config *Config) *TestingQueue {
+	workers := make(chan Worker, len(config.Workers))
+	for i := 0; i < len(config.Workers); i++ {
+		if config.Workers[i].Type == "remote" {
+			worker := NewRemoteWorker(config.Workers[i].Address)
+			workers <- worker
+		} else if config.Workers[i].Type == "local" {
+			worker := NewLocalWorker()
+			workers <- worker
+		} else {
+			log.Fatalf("Unknown worker type: %s", config.Workers[i].Type)
+		}
+	}
+	return NewTestingQueue(workers)
+}
+
+func NewTestingQueueFromFile(path string) *TestingQueue {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		log.Fatalf("Error reading config file: %v", err)
+	}
+	var obj Config
+	err = json.Unmarshal(data, &obj)
+	if err != nil {
+		log.Fatalf("Error unmarshalling config file: %v", err)
+	}
+	return NewTestingQueueFromConfig(&obj)
+}
